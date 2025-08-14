@@ -5,7 +5,7 @@ export const env = {
   MBTA_API_KEY: process.env.MBTA_API_KEY,
 
   // URLs
-  API_BASE_URL: process.env.NEXT_PUBLIC_API_URL || "http://localhost:3000",
+  API_BASE_URL: process.env.NEXT_PUBLIC_API_URL || "",
 
   // Feature flags
   ENABLE_WEATHER: process.env.NEXT_PUBLIC_ENABLE_WEATHER === "true",
