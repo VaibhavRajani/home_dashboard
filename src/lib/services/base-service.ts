@@ -1,6 +1,5 @@
 import { cache, CACHE_KEYS } from "../cache";
 import { rateLimiter, RATE_LIMITS } from "../rate-limiter";
-import { env } from "@/config/env";
 
 export abstract class BaseService {
   protected abstract readonly cacheKey: keyof typeof CACHE_KEYS;
@@ -22,7 +21,7 @@ export abstract class BaseService {
     );
   }
 
-  protected handleError<T>(error: any, fallback: T): T {
+  protected handleError<T>(error: unknown, fallback: T): T {
     console.error(`Error in ${this.constructor.name}:`, error);
     return fallback;
   }

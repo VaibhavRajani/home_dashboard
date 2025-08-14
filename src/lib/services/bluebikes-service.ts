@@ -3,6 +3,21 @@ import { BluebikesStation } from "@/types/dashboard";
 import { BaseService } from "./base-service";
 import { API_ENDPOINTS, BLUEBIKES_CONFIG, CACHE_TTL } from "../constants";
 
+interface BluebikesStationResponse {
+  station_id: string;
+  name: string;
+  num_bikes_available: number;
+  num_docks_available: number;
+  num_ebikes_available?: number;
+  num_scooters_available?: number;
+  is_installed: boolean;
+  is_renting: boolean;
+}
+
+interface BluebikesSystemStatus {
+  is_renting: boolean;
+}
+
 export class BluebikesService extends BaseService {
   private static instance: BluebikesService;
 
@@ -28,13 +43,14 @@ export class BluebikesService extends BaseService {
 
     try {
       const response = await axios.get(API_ENDPOINTS.BLUEBIKES.STATION_STATUS);
-      const stations = response.data.data.stations;
+      const stations = response.data.data
+        .stations as BluebikesStationResponse[];
 
       const brooklineStations = stations
-        .filter((station: any) =>
-          BLUEBIKES_CONFIG.STATIONS.includes(station.station_id)
+        .filter((station: BluebikesStationResponse) =>
+          BLUEBIKES_CONFIG.STATIONS.includes(station.station_id as string)
         )
-        .map((station: any) => ({
+        .map((station: BluebikesStationResponse) => ({
           stationId: station.station_id,
           name: station.name,
           numBikesAvailable: station.num_bikes_available,
@@ -55,7 +71,7 @@ export class BluebikesService extends BaseService {
   async getSystemStatus(): Promise<{ status: string; message?: string }> {
     try {
       const response = await axios.get(API_ENDPOINTS.BLUEBIKES.SYSTEM_STATUS);
-      const systemStatus = response.data.data;
+      const systemStatus = response.data.data as BluebikesSystemStatus;
 
       if (systemStatus.is_renting) {
         return { status: "operational" };

@@ -1,14 +1,8 @@
 "use client";
 
 import { WeatherData } from "@/types/dashboard";
-import {
-  Cloud,
-  Thermometer,
-  Droplets,
-  Sunrise,
-  Sunset,
-  CloudRain,
-} from "lucide-react";
+import { Thermometer, CloudRain, Sunrise, Sunset } from "lucide-react";
+import Image from "next/image";
 
 interface WeatherCardProps {
   weather: WeatherData | null;
@@ -17,42 +11,41 @@ interface WeatherCardProps {
 export default function WeatherCard({ weather }: WeatherCardProps) {
   if (!weather) {
     return (
-      <div className="bg-white/80 backdrop-blur-sm rounded-2xl shadow-xl border border-white/20 h-full flex items-center justify-center">
+      <div className="bg-gradient-to-br from-slate-900 via-blue-900 to-slate-900 rounded-2xl shadow-2xl border border-blue-500/20 h-full overflow-hidden relative flex items-center justify-center">
         <div className="text-center">
-          <Cloud className="w-6 h-6 text-gray-400 mx-auto mb-2" />
+          <Thermometer className="w-12 h-12 text-gray-400 mx-auto mb-3" />
           <p className="text-gray-500 text-lg">Weather data unavailable</p>
         </div>
       </div>
     );
   }
 
-  const getWeatherIcon = (iconCode: string) => {
-    const baseUrl = "https://openweathermap.org/img/wn/";
-    return `${baseUrl}${iconCode}@2x.png`;
+  const fahrenheitToCelsius = (fahrenheit: number) => {
+    return Math.round(((fahrenheit - 32) * 5) / 9);
   };
 
-  const fahrenheitToCelsius = (f: number) => {
-    return Math.round(((f - 32) * 5) / 9);
+  const getWeatherIcon = (icon: string) => {
+    return `https://openweathermap.org/img/wn/${icon}@2x.png`;
   };
 
   return (
-    <div className="bg-gradient-to-r from-slate-900 via-purple-900 to-slate-900 rounded-2xl shadow-2xl h-full overflow-hidden relative">
-      {/* Animated background elements */}
-      <div className="absolute inset-0 bg-gradient-to-r from-cyan-500/10 to-purple-500/10 animate-pulse"></div>
-      <div className="absolute top-0 left-0 w-full h-full opacity-30">
-        <div className="w-full h-full bg-[radial-gradient(circle_at_30px_30px,rgba(255,255,255,0.1)_2px,transparent_2px)] bg-[length:60px_60px]"></div>
-      </div>
+    <div className="bg-gradient-to-br from-slate-900 via-blue-900 to-slate-900 rounded-2xl shadow-2xl border border-blue-500/20 h-full overflow-hidden relative">
+      {/* Animated background */}
+      <div className="absolute inset-0 bg-gradient-to-r from-blue-500/10 to-cyan-500/10 animate-pulse"></div>
 
-      <div className="h-full flex items-center justify-between py-4 px-6 text-white relative z-10">
+      {/* Content */}
+      <div className="relative z-10 p-4 h-full flex items-center justify-between">
         {/* Left Side - Main Weather Info */}
         <div className="flex items-center space-x-5">
           {/* Weather Icon with glow effect */}
           <div className="text-center relative flex flex-col items-center">
             <div className="absolute inset-0 bg-cyan-400/20 rounded-full blur-xl"></div>
-            <img
+            <Image
               src={getWeatherIcon(weather.icon)}
               alt={weather.description}
-              className="w-16 h-16 relative z-10 drop-shadow-2xl"
+              width={64}
+              height={64}
+              className="relative z-10 drop-shadow-2xl"
             />
             <p className="text-xs capitalize mt-1 text-cyan-200 font-medium">
               {weather.description}

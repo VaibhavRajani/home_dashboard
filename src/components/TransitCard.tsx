@@ -26,18 +26,6 @@ export default function TransitCard({ stops, alerts }: TransitCardProps) {
     return formatDistanceToNow(date, { addSuffix: true });
   };
 
-  const getDirectionIcon = (direction: number) => {
-    return direction === 0 ? (
-      <ArrowUp className="w-4 h-4 text-green-600" />
-    ) : (
-      <ArrowDown className="w-4 h-4 text-blue-600" />
-    );
-  };
-
-  const getDirectionName = (direction: number) => {
-    return direction === 0 ? "Outbound" : "Inbound";
-  };
-
   const getStatusColor = (timeString: string) => {
     const minutes = Math.floor(
       (new Date(timeString).getTime() - Date.now()) / (1000 * 60)

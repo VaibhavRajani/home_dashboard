@@ -45,7 +45,7 @@ export const BLUEBIKES_CONFIG = {
     "510239fe-69c3-458b-b53c-6ce001845f4a", // Washington St at Egremont Rd
     "f8349ed6-0de8-11e7-991c-3863bb43a7d0", // Beacon St at Tappan St
     "f83494b4-0de8-11e7-991c-3863bb43a7d0", // Coolidge Corner
-  ],
+  ] as string[],
   STATION_NAMES: {
     "270ad97d-035d-472a-9827-76d3187afc56": "Washington Sq",
     "510239fe-69c3-458b-b53c-6ce001845f4a": "Washington St at Egremont Rd",

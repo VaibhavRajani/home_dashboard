@@ -9,6 +9,52 @@ import {
   API_HEADERS,
 } from "../constants";
 
+interface MBTAPrediction {
+  attributes: {
+    arrival_time: string;
+    departure_time: string;
+    direction_id: number;
+  };
+  relationships: {
+    stop: { data: { id: string } };
+    trip: { data: { id: string } };
+  };
+}
+
+interface MBTATrip {
+  id: string;
+  attributes: {
+    headsign?: string;
+  };
+}
+
+interface MBTASchedule {
+  attributes: {
+    arrival_time: string;
+    departure_time: string;
+    direction_id: number;
+  };
+  relationships: {
+    stop: { data: { id: string } };
+    trip: { data: { id: string } };
+  };
+}
+
+interface MBTAAlertResponse {
+  id: string;
+  attributes: {
+    header: string;
+    short_header: string;
+    description: string;
+    severity: number;
+    effect: string;
+    service_effect: string;
+    timeframe: string;
+    banner: string;
+    url: string;
+  };
+}
+
 export class MBTAService extends BaseService {
   private static instance: MBTAService;
 
@@ -79,17 +125,19 @@ export class MBTAService extends BaseService {
       },
     });
 
-    const predictions = response.data.data;
+    const predictions = response.data.data as MBTAPrediction[];
     const trips =
-      response.data.included?.filter((item: any) => item.type === "trip") || [];
+      (response.data.included?.filter(
+        (item: { type: string }) => item.type === "trip"
+      ) as MBTATrip[]) || [];
     const now = new Date();
 
     return MBTA_CONFIG.STOPS.map((stopId) => {
       const stopPredictions = predictions.filter(
-        (p: any) => p.relationships.stop.data.id === stopId
+        (p: MBTAPrediction) => p.relationships.stop.data.id === stopId
       );
 
-      const currentPredictions = stopPredictions.filter((p: any) => {
+      const currentPredictions = stopPredictions.filter((p: MBTAPrediction) => {
         const arrivalTime = new Date(p.attributes.arrival_time);
         const oneHourAgo = new Date(now.getTime() - 60 * 60 * 1000);
         return arrivalTime > oneHourAgo;
@@ -98,9 +146,9 @@ export class MBTAService extends BaseService {
       return {
         stopId,
         stopName: MBTA_CONFIG.STOP_NAMES[stopId] || stopId,
-        predictions: currentPredictions.slice(0, 3).map((p: any) => {
+        predictions: currentPredictions.slice(0, 3).map((p: MBTAPrediction) => {
           const trip = trips.find(
-            (t: any) => t.id === p.relationships.trip.data.id
+            (t: MBTATrip) => t.id === p.relationships.trip.data.id
           );
           const headsign =
             trip?.attributes?.headsign ||
@@ -143,22 +191,23 @@ export class MBTAService extends BaseService {
         },
       });
 
-      const schedules = response.data.data;
+      const schedules = response.data.data as MBTASchedule[];
       const trips =
-        response.data.included?.filter((item: any) => item.type === "trip") ||
-        [];
+        (response.data.included?.filter(
+          (item: { type: string }) => item.type === "trip"
+        ) as MBTATrip[]) || [];
 
       return MBTA_CONFIG.STOPS.map((stopId) => {
         const stopSchedules = schedules.filter(
-          (s: any) => s.relationships.stop.data.id === stopId
+          (s: MBTASchedule) => s.relationships.stop.data.id === stopId
         );
 
         return {
           stopId,
           stopName: MBTA_CONFIG.STOP_NAMES[stopId] || stopId,
-          predictions: stopSchedules.slice(0, 3).map((s: any) => {
+          predictions: stopSchedules.slice(0, 3).map((s: MBTASchedule) => {
             const trip = trips.find(
-              (t: any) => t.id === s.relationships.trip.data.id
+              (t: MBTATrip) => t.id === s.relationships.trip.data.id
             );
             const headsign =
               trip?.attributes?.headsign ||
@@ -207,7 +256,9 @@ export class MBTAService extends BaseService {
         },
       });
 
-      const alerts: MBTAAlert[] = response.data.data.map((alert: any) => ({
+      const alerts: MBTAAlert[] = (
+        response.data.data as MBTAAlertResponse[]
+      ).map((alert: MBTAAlertResponse) => ({
         id: alert.id,
         header: alert.attributes.header,
         shortHeader: alert.attributes.short_header,
@@ -244,7 +295,7 @@ export class MBTAService extends BaseService {
         },
       });
 
-      const alerts = response.data.data;
+      const alerts = response.data.data as MBTAAlertResponse[];
       if (alerts.length > 0) {
         return {
           status: "delays",

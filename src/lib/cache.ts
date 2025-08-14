@@ -5,7 +5,7 @@ interface CacheEntry<T> {
 }
 
 class Cache {
-  private store = new Map<string, CacheEntry<any>>();
+  private store = new Map<string, CacheEntry<unknown>>();
 
   set<T>(key: string, data: T, ttl: number): void {
     this.store.set(key, {
@@ -25,7 +25,7 @@ class Cache {
       return null;
     }
 
-    return entry.data;
+    return entry.data as T;
   }
 
   has(key: string): boolean {
