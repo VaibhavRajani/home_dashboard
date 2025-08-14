@@ -31,7 +31,6 @@ export default function TransitCard({ stops, alerts }: TransitCardProps) {
       (new Date(timeString).getTime() - Date.now()) / (1000 * 60)
     );
     if (minutes <= 2) return "text-red-600 font-bold";
-    if (minutes <= 5) return "text-orange-600 font-semibold";
     return "text-green-600";
   };
 
