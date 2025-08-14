@@ -61,74 +61,70 @@ export default function BikesCard({ stations }: BikesCardProps) {
       <div className="absolute inset-0 bg-gradient-to-r from-blue-500/10 to-cyan-500/10 animate-pulse"></div>
 
       {/* Header */}
-      <div className="bg-gradient-to-r from-blue-600 to-cyan-600 px-6 py-4 relative z-10 flex-shrink-0">
-        <div className="flex items-center space-x-3">
+      <div className="bg-gradient-to-r from-blue-600 to-cyan-600 px-4 py-2 relative z-10 flex-shrink-0">
+        <div className="flex items-center space-x-2">
           <div className="relative">
             <div className="absolute inset-0 bg-blue-400/30 rounded-full blur-lg"></div>
-            <Bike className="w-8 h-8 text-white relative z-10" />
+            <Bike className="w-5 h-5 text-white relative z-10" />
           </div>
           <div>
-            <h2 className="text-2xl font-bold text-white">Bluebikes</h2>
-            <p className="text-blue-100 text-sm">Washington Square</p>
+            <h2 className="text-lg font-bold text-white">Bluebikes</h2>
+            <p className="text-blue-100 text-xs">Washington Square</p>
           </div>
         </div>
       </div>
 
       {/* Summary Stats */}
-      <div className="bg-gradient-to-r from-blue-500/20 to-cyan-500/20 backdrop-blur-sm px-6 py-4 border-b border-blue-400/30 relative z-10 flex-shrink-0">
+      <div className="bg-gradient-to-r from-blue-500/20 to-cyan-500/20 backdrop-blur-sm px-4 py-2 border-b border-blue-400/30 relative z-10 flex-shrink-0">
         <div className="flex justify-between items-center">
           <div className="text-center">
-            <div className="text-2xl font-bold text-blue-300">{totalBikes}</div>
+            <div className="text-lg font-bold text-blue-300">{totalBikes}</div>
             <div className="text-xs text-blue-200">Bikes</div>
           </div>
           <div className="text-center">
-            <div className="text-2xl font-bold text-cyan-300">
-              {totalEbikes}
-            </div>
+            <div className="text-lg font-bold text-cyan-300">{totalEbikes}</div>
             <div className="text-xs text-cyan-200">E-Bikes</div>
           </div>
           <div className="text-center">
-            <div className="text-2xl font-bold text-purple-300">
+            <div className="text-lg font-bold text-purple-300">
               {totalScooters}
             </div>
             <div className="text-xs text-purple-200">Scooters</div>
           </div>
           <div className="text-center">
-            <div className="text-2xl font-bold text-green-300">
-              {totalDocks}
-            </div>
+            <div className="text-lg font-bold text-green-300">{totalDocks}</div>
             <div className="text-xs text-green-200">Docks</div>
           </div>
         </div>
       </div>
 
       {/* Content */}
-      <div className="p-4 flex-1 overflow-y-auto relative z-10 min-h-0">
+      <div className="p-3 flex-1 overflow-y-auto relative z-10 min-h-0">
         {stations.length === 0 ? (
           <div className="text-center py-8">
             <Bike className="w-12 h-12 text-gray-400 mx-auto mb-3" />
             <p className="text-gray-500 text-lg">No mobility data available</p>
           </div>
         ) : (
-          <div className="space-y-3">
+          <div className="space-y-2">
             {stations.map((station) => (
               <div
                 key={station.stationId}
-                className="bg-gradient-to-r from-slate-800/50 to-slate-700/50 backdrop-blur-sm rounded-lg p-3 border border-blue-400/20 flex flex-col"
+                className="bg-gradient-to-r from-slate-800/50 to-slate-700/50 backdrop-blur-sm rounded-lg p-2 border border-blue-400/20 flex flex-col"
               >
                 {/* Station Header */}
                 <div className="flex items-center justify-between mb-2">
                   <div className="flex items-center space-x-2">
-                    <MapPin className="w-4 h-4 text-blue-300" />
-                    <h3 className="text-sm font-semibold text-white truncate">
+                    <MapPin className="w-3 h-3 text-blue-300" />
+                    <h3 className="text-xs font-semibold text-white truncate">
                       {getStationName(station.stationId)}
                     </h3>
                   </div>
                   <div className="flex items-center space-x-1">
                     {station.isRenting ? (
-                      <CheckCircle className="w-3 h-3 text-green-400" />
+                      <CheckCircle className="w-2 h-2 text-green-400" />
                     ) : (
-                      <XCircle className="w-3 h-3 text-red-400" />
+                      <XCircle className="w-2 h-2 text-red-400" />
                     )}
                     <span className="text-xs text-gray-300">
                       {station.isRenting ? "Active" : "Inactive"}
@@ -143,7 +139,7 @@ export default function BikesCard({ stations }: BikesCardProps) {
                       <Bike className="w-2 h-2 text-green-300" />
                       <span className="text-xs text-green-200">Bikes</span>
                     </div>
-                    <div className="text-sm font-bold text-green-300">
+                    <div className="text-xs font-bold text-green-300">
                       {station.numBikesAvailable}
                     </div>
                   </div>
@@ -152,7 +148,7 @@ export default function BikesCard({ stations }: BikesCardProps) {
                       <Zap className="w-2 h-2 text-cyan-300" />
                       <span className="text-xs text-cyan-200">E-Bikes</span>
                     </div>
-                    <div className="text-sm font-bold text-cyan-300">
+                    <div className="text-xs font-bold text-cyan-300">
                       {station.numEbikesAvailable}
                     </div>
                   </div>
@@ -161,7 +157,7 @@ export default function BikesCard({ stations }: BikesCardProps) {
                       <Sparkles className="w-2 h-2 text-purple-300" />
                       <span className="text-xs text-purple-200">Scooters</span>
                     </div>
-                    <div className="text-sm font-bold text-purple-300">
+                    <div className="text-xs font-bold text-purple-300">
                       {station.numScootersAvailable}
                     </div>
                   </div>
@@ -170,14 +166,14 @@ export default function BikesCard({ stations }: BikesCardProps) {
                       <Car className="w-2 h-2 text-blue-300" />
                       <span className="text-xs text-blue-200">Docks</span>
                     </div>
-                    <div className="text-sm font-bold text-blue-300">
+                    <div className="text-xs font-bold text-blue-300">
                       {station.numDocksAvailable}
                     </div>
                   </div>
                 </div>
 
                 {/* Status */}
-                <div className="mt-2 text-center">
+                <div className="mt-1 text-center">
                   <span
                     className={`text-xs font-medium ${getAvailabilityColor(
                       station.numBikesAvailable,

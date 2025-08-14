@@ -51,15 +51,15 @@ export default function TransitCard({ stops, alerts }: TransitCardProps) {
       <div className="absolute inset-0 bg-gradient-to-r from-green-500/10 to-emerald-500/10 animate-pulse"></div>
 
       {/* Header */}
-      <div className="bg-gradient-to-r from-green-600 to-emerald-600 px-4 py-3 relative z-10 flex-shrink-0">
+      <div className="bg-gradient-to-r from-green-600 to-emerald-600 px-4 py-2 relative z-10 flex-shrink-0">
         <div className="flex items-center justify-between">
           <div className="flex items-center space-x-2">
             <div className="relative">
               <div className="absolute inset-0 bg-green-400/30 rounded-full blur-lg"></div>
-              <Train className="w-6 h-6 text-white relative z-10" />
+              <Train className="w-5 h-5 text-white relative z-10" />
             </div>
             <div>
-              <h2 className="text-xl font-bold text-white">Green Line</h2>
+              <h2 className="text-lg font-bold text-white">Green Line</h2>
               <p className="text-green-100 text-xs">C & D Lines</p>
             </div>
           </div>
@@ -72,13 +72,13 @@ export default function TransitCard({ stops, alerts }: TransitCardProps) {
                 className="relative group"
               >
                 <div className="absolute inset-0 bg-yellow-400/20 rounded-full blur-lg group-hover:bg-yellow-400/30 transition-all"></div>
-                <AlertTriangle className="w-5 h-5 text-yellow-300 relative z-10 group-hover:text-yellow-200 transition-colors" />
+                <AlertTriangle className="w-4 h-4 text-yellow-300 relative z-10 group-hover:text-yellow-200 transition-colors" />
                 <div className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full w-4 h-4 flex items-center justify-center font-bold">
                   {alerts.length}
                 </div>
               </button>
             ) : (
-              <div className="flex items-center space-x-2 bg-green-400/20 backdrop-blur-sm rounded-full px-3 py-1 border border-green-400/30">
+              <div className="flex items-center space-x-2 bg-green-400/20 backdrop-blur-sm rounded-full px-2 py-1 border border-green-400/30">
                 <div className="w-2 h-2 bg-green-300 rounded-full animate-pulse"></div>
                 <span className="text-xs font-medium text-green-200">
                   No active alerts
@@ -90,7 +90,7 @@ export default function TransitCard({ stops, alerts }: TransitCardProps) {
       </div>
 
       {/* Content */}
-      <div className="p-4 flex-1 overflow-y-auto relative z-10 min-h-0">
+      <div className="p-3 flex-1 overflow-y-auto relative z-10 min-h-0">
         {stops.length === 0 ? (
           <div className="text-center py-8">
             <Train className="w-12 h-12 text-gray-400 mx-auto mb-3" />
@@ -132,10 +132,12 @@ export default function TransitCard({ stops, alerts }: TransitCardProps) {
                   className="bg-gradient-to-r from-slate-800/50 to-slate-700/50 backdrop-blur-sm rounded-lg p-3 border border-green-400/20 flex-1 flex flex-col"
                 >
                   {/* Stop Header */}
-                  <div className="flex items-center space-x-2 mb-3">
+                  <div className="flex items-center space-x-2 mb-2">
                     <MapPin className="w-4 h-4 text-green-300" />
                     <h3 className="text-sm font-semibold text-white">
-                      {stopName} Square
+                      {stopName === "Washington"
+                        ? `${stopName} Square`
+                        : stopName}
                     </h3>
                   </div>
 
@@ -166,7 +168,7 @@ export default function TransitCard({ stops, alerts }: TransitCardProps) {
                                 </div>
                                 <div className="text-right">
                                   <div
-                                    className={`text-sm font-bold ${getStatusColor(
+                                    className={`text-xs font-bold ${getStatusColor(
                                       prediction.arrivalTime
                                     )}`}
                                   >
@@ -204,7 +206,7 @@ export default function TransitCard({ stops, alerts }: TransitCardProps) {
                                 </div>
                                 <div className="text-right">
                                   <div
-                                    className={`text-sm font-bold ${getStatusColor(
+                                    className={`text-xs font-bold ${getStatusColor(
                                       prediction.arrivalTime
                                     )}`}
                                   >
