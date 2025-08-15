@@ -93,17 +93,33 @@ export default function HomePage() {
             </div>
           </div>
 
-          {/* Refresh Button */}
-          <button
-            onClick={refetch}
-            disabled={loading}
-            className="flex items-center space-x-1 bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 disabled:from-gray-400 disabled:to-gray-500 text-white px-2 py-1 rounded-md transition-all duration-200 shadow-sm hover:shadow-md disabled:shadow-none text-xs"
-          >
-            <RefreshCw className={`w-3 h-3 ${loading ? "animate-spin" : ""}`} />
-            <span className="font-medium">
-              {loading ? "Refreshing..." : "Refresh"}
-            </span>
-          </button>
+          {/* Action Buttons */}
+          <div className="flex items-center space-x-2">
+            {/* Pays Rent Button */}
+            <a
+              href="https://rent683.vercel.app"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-center space-x-1 bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white px-2 py-1 rounded-md transition-all duration-200 shadow-sm hover:shadow-md text-xs font-medium"
+            >
+              <span>💰</span>
+              <span>Pay Rent</span>
+            </a>
+
+            {/* Refresh Button */}
+            <button
+              onClick={refetch}
+              disabled={loading}
+              className="flex items-center space-x-1 bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 disabled:from-gray-400 disabled:to-gray-500 text-white px-2 py-1 rounded-md transition-all duration-200 shadow-sm hover:shadow-md disabled:shadow-none text-xs"
+            >
+              <RefreshCw
+                className={`w-3 h-3 ${loading ? "animate-spin" : ""}`}
+              />
+              <span className="font-medium">
+                {loading ? "Refreshing..." : "Refresh"}
+              </span>
+            </button>
+          </div>
         </div>
       </div>
     </div>
