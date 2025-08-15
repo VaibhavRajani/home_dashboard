@@ -1,5 +1,9 @@
 import axios from "axios";
-import { MBTAStop, MBTAAlert, MBTAPrediction as DashboardMBTAPrediction } from "@/types/dashboard";
+import {
+  MBTAStop,
+  MBTAAlert,
+  MBTAPrediction as DashboardMBTAPrediction,
+} from "@/types/dashboard";
 import { env } from "@/config/env";
 import { BaseService } from "./base-service";
 import {
@@ -133,11 +137,13 @@ export class MBTAService extends BaseService {
         (p: MBTAPredictionResponse) => p.relationships.stop.data.id === stopId
       );
 
-      const currentPredictions = stopPredictions.filter((p: MBTAPredictionResponse) => {
-        const arrivalTime = new Date(p.attributes.arrival_time);
-        const thirtyMinutesAgo = new Date(now.getTime() - 30 * 60 * 1000);
-        return arrivalTime > thirtyMinutesAgo;
-      });
+      const currentPredictions = stopPredictions.filter(
+        (p: MBTAPredictionResponse) => {
+          const arrivalTime = new Date(p.attributes.arrival_time);
+          const thirtyMinutesAgo = new Date(now.getTime() - 30 * 60 * 1000);
+          return arrivalTime > thirtyMinutesAgo;
+        }
+      );
 
       // Debug logging for real-time data
       if (stopPredictions.length > 0 && currentPredictions.length === 0) {
@@ -160,24 +166,26 @@ export class MBTAService extends BaseService {
       return {
         stopId,
         stopName: MBTA_CONFIG.STOP_NAMES[stopId] || stopId,
-        predictions: currentPredictions.slice(0, 3).map((p: MBTAPredictionResponse) => {
-          const trip = trips.find(
-            (t: MBTATrip) => t.id === p.relationships.trip.data.id
-          );
-          const headsign =
-            trip?.attributes?.headsign ||
-            `Green Line ${
-              p.attributes.direction_id === 0 ? "Outbound" : "Inbound"
-            }`;
+        predictions: currentPredictions
+          .slice(0, 3)
+          .map((p: MBTAPredictionResponse) => {
+            const trip = trips.find(
+              (t: MBTATrip) => t.id === p.relationships.trip.data.id
+            );
+            const headsign =
+              trip?.attributes?.headsign ||
+              `Green Line ${
+                p.attributes.direction_id === 0 ? "Outbound" : "Inbound"
+              }`;
 
-          return {
-            arrivalTime: p.attributes.arrival_time,
-            departureTime: p.attributes.departure_time,
-            direction: p.attributes.direction_id,
-            headsign,
-            dataSource: "realtime" as const,
-          };
-        }),
+            return {
+              arrivalTime: p.attributes.arrival_time,
+              departureTime: p.attributes.departure_time,
+              direction: p.attributes.direction_id,
+              headsign,
+              dataSource: "realtime" as const,
+            };
+          }),
         dataSource: "realtime" as const,
       };
     });

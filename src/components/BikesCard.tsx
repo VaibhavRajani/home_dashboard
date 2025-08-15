@@ -2,14 +2,7 @@
 
 import { BluebikesStation } from "@/types/dashboard";
 import { BLUEBIKES_CONFIG } from "@/lib/constants";
-import {
-  Bike,
-  MapPin,
-  CheckCircle,
-  XCircle,
-  Car,
-  Zap,
-} from "lucide-react";
+import { Bike, MapPin, CheckCircle, XCircle, Car, Zap } from "lucide-react";
 
 interface BikesCardProps {
   stations: BluebikesStation[];
@@ -62,7 +55,7 @@ export default function BikesCard({ stations }: BikesCardProps) {
             <div className="absolute inset-0 bg-blue-400/30 rounded-full blur-lg"></div>
             <Bike className="w-5 h-5 text-white relative z-10" />
           </div>
-          <div>
+          <div className="flex gap-2 items-center">
             <h2 className="text-lg font-bold text-white">Bluebikes</h2>
             <p className="text-blue-100 text-xs">Washington Square</p>
           </div>
@@ -81,9 +74,7 @@ export default function BikesCard({ stations }: BikesCardProps) {
             <div className="text-xs text-cyan-200">E-Bikes</div>
           </div>
           <div className="text-center">
-            <div className="text-lg font-bold text-green-300">
-              {totalDocks}
-            </div>
+            <div className="text-lg font-bold text-green-300">{totalDocks}</div>
             <div className="text-xs text-green-200">Docks</div>
           </div>
         </div>

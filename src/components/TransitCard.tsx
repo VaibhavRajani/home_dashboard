@@ -79,7 +79,7 @@ export default function TransitCard({ stops, alerts }: TransitCardProps) {
               <div className="absolute inset-0 bg-green-400/30 rounded-full blur-lg"></div>
               <Train className="w-5 h-5 text-white relative z-10" />
             </div>
-            <div>
+            <div className="flex gap-2 items-center">
               <h2 className="text-lg font-bold text-white">Green Line</h2>
               <p className="text-green-100 text-xs">C & D Lines</p>
             </div>
