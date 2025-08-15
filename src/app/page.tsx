@@ -47,12 +47,12 @@ export default function HomePage() {
 
       {/* Main Content - Side by Side Cards */}
       <div className="flex gap-4 flex-1 min-h-0">
-        {/* MBTA Card - Left Half */}
-        <div className="flex-1">
+        {/* MBTA Card - Takes up more space */}
+        <div className="flex-[2]">
           <TransitCard stops={data?.mbta || []} alerts={data?.alerts || []} />
         </div>
 
-        {/* Bluebikes Card - Right Half */}
+        {/* Bluebikes Card - Narrower */}
         <div className="flex-1">
           <BikesCard stations={data?.bikes || []} />
         </div>

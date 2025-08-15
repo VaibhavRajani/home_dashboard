@@ -9,7 +9,6 @@ import {
   XCircle,
   Car,
   Zap,
-  Sparkles,
 } from "lucide-react";
 
 interface BikesCardProps {
@@ -50,10 +49,6 @@ export default function BikesCard({ stations }: BikesCardProps) {
     (sum, station) => sum + station.numEbikesAvailable,
     0
   );
-  const totalScooters = stations.reduce(
-    (sum, station) => sum + station.numScootersAvailable,
-    0
-  );
 
   return (
     <div className="bg-gradient-to-br from-slate-900 via-blue-900 to-slate-900 rounded-2xl shadow-2xl border border-blue-500/20 h-full overflow-hidden relative flex flex-col">
@@ -86,13 +81,9 @@ export default function BikesCard({ stations }: BikesCardProps) {
             <div className="text-xs text-cyan-200">E-Bikes</div>
           </div>
           <div className="text-center">
-            <div className="text-lg font-bold text-purple-300">
-              {totalScooters}
+            <div className="text-lg font-bold text-green-300">
+              {totalDocks}
             </div>
-            <div className="text-xs text-purple-200">Scooters</div>
-          </div>
-          <div className="text-center">
-            <div className="text-lg font-bold text-green-300">{totalDocks}</div>
             <div className="text-xs text-green-200">Docks</div>
           </div>
         </div>
@@ -133,7 +124,7 @@ export default function BikesCard({ stations }: BikesCardProps) {
                 </div>
 
                 {/* Availability Grid */}
-                <div className="grid grid-cols-4 gap-1 flex-1">
+                <div className="grid grid-cols-3 gap-1 flex-1">
                   <div className="bg-gradient-to-br from-green-500/20 to-green-600/20 backdrop-blur-sm rounded p-1 text-center border border-green-400/30 flex flex-col justify-center">
                     <div className="flex items-center justify-center space-x-1 mb-1">
                       <Bike className="w-2 h-2 text-green-300" />
@@ -150,15 +141,6 @@ export default function BikesCard({ stations }: BikesCardProps) {
                     </div>
                     <div className="text-xs font-bold text-cyan-300">
                       {station.numEbikesAvailable}
-                    </div>
-                  </div>
-                  <div className="bg-gradient-to-br from-purple-500/20 to-purple-600/20 backdrop-blur-sm rounded p-1 text-center border border-purple-400/30 flex flex-col justify-center">
-                    <div className="flex items-center justify-center space-x-1 mb-1">
-                      <Sparkles className="w-2 h-2 text-purple-300" />
-                      <span className="text-xs text-purple-200">Scooters</span>
-                    </div>
-                    <div className="text-xs font-bold text-purple-300">
-                      {station.numScootersAvailable}
                     </div>
                   </div>
                   <div className="bg-gradient-to-br from-blue-500/20 to-blue-600/20 backdrop-blur-sm rounded p-1 text-center border border-blue-400/30 flex flex-col justify-center">

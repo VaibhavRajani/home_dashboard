@@ -34,15 +34,37 @@ export default function TransitCard({ stops, alerts }: TransitCardProps) {
     return "text-green-600";
   };
 
-  // Group stops by name to ensure each stop gets its own row
+  // Group stops by location (Washington or Beaconsfield) and handle separate inbound/outbound stops
   const stopGroups = stops.reduce((groups, stop) => {
-    const stopName = stop.stopName.split(" ")[0]; // Get first word (Washington or Beaconsfield)
-    if (!groups[stopName]) {
-      groups[stopName] = [];
+    // Extract the location name (Washington or Beaconsfield)
+    const locationName = stop.stopName.includes("Washington")
+      ? "Washington"
+      : "Beaconsfield";
+
+    if (!groups[locationName]) {
+      groups[locationName] = {
+        outbound: null,
+        inbound: null,
+      };
     }
-    groups[stopName].push(stop);
+
+    // Determine if this is inbound or outbound based on stop name or stop ID
+    if (
+      stop.stopName.includes("Outbound") ||
+      stop.stopId === "70229" ||
+      stop.stopId === "70177"
+    ) {
+      groups[locationName].outbound = stop;
+    } else if (
+      stop.stopName.includes("Inbound") ||
+      stop.stopId === "70230" ||
+      stop.stopId === "70176"
+    ) {
+      groups[locationName].inbound = stop;
+    }
+
     return groups;
-  }, {} as Record<string, MBTAStop[]>);
+  }, {} as Record<string, { outbound: MBTAStop | null; inbound: MBTAStop | null }>);
 
   return (
     <div className="bg-gradient-to-br from-slate-900 via-green-900 to-slate-900 rounded-2xl shadow-2xl border border-green-500/20 h-full overflow-hidden relative flex flex-col">
@@ -125,18 +147,18 @@ export default function TransitCard({ stops, alerts }: TransitCardProps) {
 
             {/* Stop Layout - Each stop gets its own row */}
             <div className="space-y-3 h-full">
-              {Object.entries(stopGroups).map(([stopName, stopGroup]) => (
+              {Object.entries(stopGroups).map(([locationName, stops]) => (
                 <div
-                  key={stopName}
+                  key={locationName}
                   className="bg-gradient-to-r from-slate-800/50 to-slate-700/50 backdrop-blur-sm rounded-lg p-3 border border-green-400/20 flex-1 flex flex-col"
                 >
                   {/* Stop Header */}
                   <div className="flex items-center space-x-2 mb-2">
                     <MapPin className="w-4 h-4 text-green-300" />
                     <h3 className="text-sm font-semibold text-white">
-                      {stopName === "Washington"
-                        ? `${stopName} Square`
-                        : stopName}
+                      {locationName === "Washington"
+                        ? `${locationName} Square`
+                        : locationName}
                     </h3>
                   </div>
 
@@ -151,32 +173,39 @@ export default function TransitCard({ stops, alerts }: TransitCardProps) {
                         </h4>
                       </div>
                       <div className="space-y-2 flex-1">
-                        {stopGroup
-                          .flatMap((stop) =>
-                            stop.predictions.filter((p) => p.direction === 0)
-                          )
-                          .slice(0, 2)
-                          .map((prediction, index) => (
-                            <div
-                              key={index}
-                              className="bg-gradient-to-r from-slate-700/50 to-slate-600/50 backdrop-blur-sm rounded p-2 border border-green-400/30 flex-1"
-                            >
-                              <div className="flex items-center justify-between h-full">
-                                <div className="text-xs text-white font-medium truncate">
-                                  {prediction.headsign}
-                                </div>
-                                <div className="text-right">
-                                  <div
-                                    className={`text-xs font-bold ${getStatusColor(
-                                      prediction.arrivalTime
-                                    )}`}
-                                  >
-                                    {formatTime(prediction.arrivalTime)}
+                        {stops.outbound &&
+                          stops.outbound.predictions
+                            .filter((p) => p.direction === 0)
+                            .slice(0, 2)
+                            .map((prediction, index) => (
+                              <div
+                                key={index}
+                                className="bg-gradient-to-r from-slate-700/50 to-slate-600/50 backdrop-blur-sm rounded p-2 border border-green-400/30 flex-1"
+                              >
+                                <div className="flex items-center justify-between h-full">
+                                  <div className="flex flex-col">
+                                    <div className="text-xs text-white font-medium truncate">
+                                      {prediction.headsign}
+                                      {prediction.dataSource ===
+                                        "scheduled" && (
+                                        <span className="ml-1 text-xs text-blue-300 font-medium">
+                                          (Scheduled)
+                                        </span>
+                                      )}
+                                    </div>
+                                  </div>
+                                  <div className="text-right">
+                                    <div
+                                      className={`text-xs font-bold ${getStatusColor(
+                                        prediction.arrivalTime
+                                      )}`}
+                                    >
+                                      {formatTime(prediction.arrivalTime)}
+                                    </div>
                                   </div>
                                 </div>
                               </div>
-                            </div>
-                          ))}
+                            ))}
                       </div>
                     </div>
 
@@ -189,32 +218,39 @@ export default function TransitCard({ stops, alerts }: TransitCardProps) {
                         </h4>
                       </div>
                       <div className="space-y-2 flex-1">
-                        {stopGroup
-                          .flatMap((stop) =>
-                            stop.predictions.filter((p) => p.direction === 1)
-                          )
-                          .slice(0, 2)
-                          .map((prediction, index) => (
-                            <div
-                              key={index}
-                              className="bg-gradient-to-r from-slate-700/50 to-slate-600/50 backdrop-blur-sm rounded p-2 border border-blue-400/30 flex-1"
-                            >
-                              <div className="flex items-center justify-between h-full">
-                                <div className="text-xs text-white font-medium truncate">
-                                  {prediction.headsign}
-                                </div>
-                                <div className="text-right">
-                                  <div
-                                    className={`text-xs font-bold ${getStatusColor(
-                                      prediction.arrivalTime
-                                    )}`}
-                                  >
-                                    {formatTime(prediction.arrivalTime)}
+                        {stops.inbound &&
+                          stops.inbound.predictions
+                            .filter((p) => p.direction === 1)
+                            .slice(0, 2)
+                            .map((prediction, index) => (
+                              <div
+                                key={index}
+                                className="bg-gradient-to-r from-slate-700/50 to-slate-600/50 backdrop-blur-sm rounded p-2 border border-blue-400/30 flex-1"
+                              >
+                                <div className="flex items-center justify-between h-full">
+                                  <div className="flex flex-col">
+                                    <div className="text-xs text-white font-medium truncate">
+                                      {prediction.headsign}
+                                      {prediction.dataSource ===
+                                        "scheduled" && (
+                                        <span className="ml-1 text-xs text-blue-300 font-medium">
+                                          (Scheduled)
+                                        </span>
+                                      )}
+                                    </div>
+                                  </div>
+                                  <div className="text-right">
+                                    <div
+                                      className={`text-xs font-bold ${getStatusColor(
+                                        prediction.arrivalTime
+                                      )}`}
+                                    >
+                                      {formatTime(prediction.arrivalTime)}
+                                    </div>
                                   </div>
                                 </div>
                               </div>
-                            </div>
-                          ))}
+                            ))}
                       </div>
                     </div>
                   </div>

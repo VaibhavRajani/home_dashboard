@@ -1,5 +1,5 @@
 import axios from "axios";
-import { MBTAStop, MBTAAlert } from "@/types/dashboard";
+import { MBTAStop, MBTAAlert, MBTAPrediction as DashboardMBTAPrediction } from "@/types/dashboard";
 import { env } from "@/config/env";
 import { BaseService } from "./base-service";
 import {
@@ -9,7 +9,7 @@ import {
   API_HEADERS,
 } from "../constants";
 
-interface MBTAPrediction {
+interface MBTAPredictionResponse {
   attributes: {
     arrival_time: string;
     departure_time: string;
@@ -85,21 +85,17 @@ export class MBTAService extends BaseService {
 
     try {
       const realtimeData = await this.getRealtimePredictions();
+      const scheduledData = await this.getScheduledTimes();
 
-      const totalPredictions = realtimeData.reduce(
-        (sum, stop) => sum + stop.predictions.length,
-        0
+      // Merge real-time and scheduled data, using scheduled as fallback
+      const mergedData = this.mergeRealtimeAndScheduled(
+        realtimeData,
+        scheduledData
       );
 
-      if (totalPredictions > 0) {
-        this.setCached(realtimeData);
-        return realtimeData;
-      }
-
-      const scheduledData = await this.getScheduledTimes();
-      if (scheduledData.length > 0) {
-        this.setCached(scheduledData);
-        return scheduledData;
+      if (mergedData.some((stop) => stop.predictions.length > 0)) {
+        this.setCached(mergedData);
+        return mergedData;
       }
 
       console.warn("No real-time or scheduled data available");
@@ -125,7 +121,7 @@ export class MBTAService extends BaseService {
       },
     });
 
-    const predictions = response.data.data as MBTAPrediction[];
+    const predictions = response.data.data as MBTAPredictionResponse[];
     const trips =
       (response.data.included?.filter(
         (item: { type: string }) => item.type === "trip"
@@ -134,19 +130,37 @@ export class MBTAService extends BaseService {
 
     return MBTA_CONFIG.STOPS.map((stopId) => {
       const stopPredictions = predictions.filter(
-        (p: MBTAPrediction) => p.relationships.stop.data.id === stopId
+        (p: MBTAPredictionResponse) => p.relationships.stop.data.id === stopId
       );
 
-      const currentPredictions = stopPredictions.filter((p: MBTAPrediction) => {
+      const currentPredictions = stopPredictions.filter((p: MBTAPredictionResponse) => {
         const arrivalTime = new Date(p.attributes.arrival_time);
-        const oneHourAgo = new Date(now.getTime() - 60 * 60 * 1000);
-        return arrivalTime > oneHourAgo;
+        const thirtyMinutesAgo = new Date(now.getTime() - 30 * 60 * 1000);
+        return arrivalTime > thirtyMinutesAgo;
       });
+
+      // Debug logging for real-time data
+      if (stopPredictions.length > 0 && currentPredictions.length === 0) {
+        console.log(
+          `Stop ${stopId} has ${stopPredictions.length} predictions but ${currentPredictions.length} after filtering`
+        );
+        console.log(
+          "Sample predictions:",
+          stopPredictions.slice(0, 2).map((p) => ({
+            arrivalTime: p.attributes.arrival_time,
+            direction: p.attributes.direction_id,
+            timeDiff: Math.floor(
+              (new Date(p.attributes.arrival_time).getTime() - now.getTime()) /
+                (1000 * 60)
+            ),
+          }))
+        );
+      }
 
       return {
         stopId,
         stopName: MBTA_CONFIG.STOP_NAMES[stopId] || stopId,
-        predictions: currentPredictions.slice(0, 3).map((p: MBTAPrediction) => {
+        predictions: currentPredictions.slice(0, 3).map((p: MBTAPredictionResponse) => {
           const trip = trips.find(
             (t: MBTATrip) => t.id === p.relationships.trip.data.id
           );
@@ -161,6 +175,7 @@ export class MBTAService extends BaseService {
             departureTime: p.attributes.departure_time,
             direction: p.attributes.direction_id,
             headsign,
+            dataSource: "realtime" as const,
           };
         }),
         dataSource: "realtime" as const,
@@ -220,14 +235,173 @@ export class MBTAService extends BaseService {
               departureTime: s.attributes.departure_time,
               direction: s.attributes.direction_id,
               headsign,
+              dataSource: "scheduled" as const,
             };
           }),
           dataSource: "scheduled" as const,
         };
       });
     } catch (error) {
+      console.error("Error fetching scheduled times:", error);
       return this.handleError(error, []);
     }
+  }
+
+  private mergeRealtimeAndScheduled(
+    realtimeData: MBTAStop[],
+    scheduledData: MBTAStop[]
+  ): MBTAStop[] {
+    return MBTA_CONFIG.STOPS.map((stopId) => {
+      const realtimeStop = realtimeData.find((stop) => stop.stopId === stopId);
+      const scheduledStop = scheduledData.find(
+        (stop) => stop.stopId === stopId
+      );
+
+      const realtimePredictions = realtimeStop?.predictions || [];
+      const scheduledPredictions = scheduledStop?.predictions || [];
+
+      // Group predictions by direction
+      const realtimeByDirection = {
+        0: realtimePredictions.filter((p) => p.direction === 0),
+        1: realtimePredictions.filter((p) => p.direction === 1),
+      };
+
+      const scheduledByDirection = {
+        0: scheduledPredictions.filter((p) => p.direction === 0),
+        1: scheduledPredictions.filter((p) => p.direction === 1),
+      };
+
+      // For each direction, use real-time if available, otherwise fall back to scheduled
+      const mergedPredictions = [];
+
+      // Helper function to filter out scheduled predictions that are too close to real-time ones
+      const filterScheduledPredictions = (
+        scheduledPreds: DashboardMBTAPrediction[],
+        realtimePreds: DashboardMBTAPrediction[]
+      ) => {
+        if (realtimePreds.length === 0) return scheduledPreds;
+
+        return scheduledPreds.filter((scheduledPred) => {
+          const scheduledTime = new Date(scheduledPred.arrivalTime);
+          return !realtimePreds.some((realtimePred) => {
+            const realtimeTime = new Date(realtimePred.arrivalTime);
+            const timeDiff = Math.abs(
+              scheduledTime.getTime() - realtimeTime.getTime()
+            );
+            return timeDiff < 2 * 60 * 1000; // 2 minutes
+          });
+        });
+      };
+
+      // Outbound (direction 0)
+      if (realtimeByDirection[0].length > 0) {
+        console.log(
+          `Stop ${stopId} outbound: Using ${realtimeByDirection[0].length} real-time predictions`
+        );
+        // Add all available real-time predictions (up to 2)
+        mergedPredictions.push(
+          ...realtimeByDirection[0].slice(0, 2).map((p) => ({
+            ...p,
+            dataSource: "realtime" as const,
+          }))
+        );
+
+        // If we have less than 2 real-time predictions and there are scheduled predictions, add scheduled to fill the gap
+        if (
+          realtimeByDirection[0].length < 2 &&
+          scheduledByDirection[0].length > 0
+        ) {
+          const remainingSlots = 2 - realtimeByDirection[0].length;
+          const filteredScheduled = filterScheduledPredictions(
+            scheduledByDirection[0],
+            realtimeByDirection[0]
+          );
+          const scheduledToAdd = filteredScheduled.slice(0, remainingSlots);
+          console.log(
+            `Stop ${stopId} outbound: Adding ${scheduledToAdd.length} scheduled predictions to fill gap`
+          );
+          mergedPredictions.push(
+            ...scheduledToAdd.map((p) => ({
+              ...p,
+              dataSource: "scheduled" as const,
+            }))
+          );
+        }
+      } else if (scheduledByDirection[0].length > 0) {
+        console.log(
+          `Stop ${stopId} outbound: No real-time data, using ${scheduledByDirection[0].length} scheduled predictions`
+        );
+        mergedPredictions.push(
+          ...scheduledByDirection[0].slice(0, 2).map((p) => ({
+            ...p,
+            dataSource: "scheduled" as const,
+          }))
+        );
+      } else {
+        console.log(
+          `Stop ${stopId} outbound: No real-time or scheduled data available`
+        );
+      }
+
+      // Inbound (direction 1)
+      if (realtimeByDirection[1].length > 0) {
+        console.log(
+          `Stop ${stopId} inbound: Using ${realtimeByDirection[1].length} real-time predictions`
+        );
+        // Add all available real-time predictions (up to 2)
+        mergedPredictions.push(
+          ...realtimeByDirection[1].slice(0, 2).map((p) => ({
+            ...p,
+            dataSource: "realtime" as const,
+          }))
+        );
+
+        // If we have less than 2 real-time predictions and there are scheduled predictions, add scheduled to fill the gap
+        if (
+          realtimeByDirection[1].length < 2 &&
+          scheduledByDirection[1].length > 0
+        ) {
+          const remainingSlots = 2 - realtimeByDirection[1].length;
+          const filteredScheduled = filterScheduledPredictions(
+            scheduledByDirection[1],
+            realtimeByDirection[1]
+          );
+          const scheduledToAdd = filteredScheduled.slice(0, remainingSlots);
+          console.log(
+            `Stop ${stopId} inbound: Adding ${scheduledToAdd.length} scheduled predictions to fill gap`
+          );
+          mergedPredictions.push(
+            ...scheduledToAdd.map((p) => ({
+              ...p,
+              dataSource: "scheduled" as const,
+            }))
+          );
+        }
+      } else if (scheduledByDirection[1].length > 0) {
+        console.log(
+          `Stop ${stopId} inbound: No real-time data, using ${scheduledByDirection[1].length} scheduled predictions`
+        );
+        mergedPredictions.push(
+          ...scheduledByDirection[1].slice(0, 2).map((p) => ({
+            ...p,
+            dataSource: "scheduled" as const,
+          }))
+        );
+      } else {
+        console.log(
+          `Stop ${stopId} inbound: No real-time or scheduled data available`
+        );
+      }
+
+      return {
+        stopId,
+        stopName: MBTA_CONFIG.STOP_NAMES[stopId] || stopId,
+        predictions: mergedPredictions,
+        dataSource: mergedPredictions.some((p) => p.dataSource === "scheduled")
+          ? ("mixed" as const)
+          : ("realtime" as const),
+      };
+    });
   }
 
   async getAlerts(): Promise<MBTAAlert[]> {

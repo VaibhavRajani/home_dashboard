@@ -35,9 +35,9 @@ export default function WeatherCard({ weather }: WeatherCardProps) {
 
       {/* Content */}
       <div className="relative z-10 p-3 h-full flex items-center justify-between">
-        {/* Left Side - Main Weather Info */}
-        <div className="flex items-center space-x-3">
-          {/* Weather Icon with glow effect */}
+        {/* Left Side - Weather Icon and Temperature */}
+        <div className="flex items-center space-x-4">
+          {/* Weather Icon */}
           <div className="text-center relative flex flex-col items-center">
             <div className="absolute inset-0 bg-cyan-400/20 rounded-full blur-xl"></div>
             <Image
@@ -52,7 +52,7 @@ export default function WeatherCard({ weather }: WeatherCardProps) {
             </p>
           </div>
 
-          {/* Temperature in Celsius */}
+          {/* Temperature */}
           <div className="text-center flex flex-col items-center">
             <div className="flex items-center space-x-2">
               <div className="relative">
@@ -69,74 +69,81 @@ export default function WeatherCard({ weather }: WeatherCardProps) {
               </div>
             </div>
           </div>
-
-          {/* Hourly Precipitation */}
-          <div className="text-center flex flex-col items-center">
-            <div className="bg-gradient-to-r from-blue-500/20 to-purple-500/20 backdrop-blur-sm rounded-lg p-2 border border-blue-400/30">
-              <div className="flex items-center justify-center space-x-1 mb-1">
-                <CloudRain className="w-3 h-3 text-blue-300" />
-                <span className="text-xs font-semibold text-blue-200">
-                  Hourly Rain
-                </span>
-              </div>
-              <div className="flex space-x-1">
-                {weather.hourlyPrecipitation?.map((hour, index) => (
-                  <div key={index} className="text-center">
-                    <div className="text-xs text-blue-200 mb-1">
-                      {hour.time}
-                    </div>
-                    <div className="text-xs font-bold text-white">
-                      {hour.precipitation}%
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </div>
         </div>
 
         {/* Center - Date and Time */}
-        <div className="text-center flex flex-col items-center">
-          <div className="bg-gradient-to-r from-purple-500/20 to-pink-500/20 backdrop-blur-sm rounded-lg p-3 border border-purple-400/30 min-w-[120px]">
-            <div className="text-sm font-bold text-white">
-              {new Date().toLocaleDateString("en-US", {
-                weekday: "short",
-                month: "short",
-                day: "numeric",
-              })}
-            </div>
-            <div className="text-lg font-bold bg-gradient-to-r from-purple-300 to-pink-300 bg-clip-text text-transparent">
-              {new Date().toLocaleTimeString("en-US", {
-                hour: "2-digit",
-                minute: "2-digit",
-                hour12: true,
-              })}
-            </div>
+        <div className="text-center">
+          <div className="text-sm font-bold text-white">
+            {new Date().toLocaleDateString("en-US", {
+              weekday: "long",
+              month: "long",
+              day: "numeric",
+            })}
+          </div>
+          <div className="text-2xl font-bold bg-gradient-to-r from-cyan-300 to-purple-300 bg-clip-text text-transparent">
+            {new Date().toLocaleTimeString("en-US", {
+              hour: "2-digit",
+              minute: "2-digit",
+              hour12: true,
+            })}
           </div>
         </div>
 
-        {/* Right Side - Weather Details */}
-        <div className="flex space-x-2">
+        {/* Right Side - Sunrise, Sunset, and Precipitation */}
+        <div className="flex items-center space-x-3">
           {/* Sunrise */}
-          <div className="text-center bg-white/10 backdrop-blur-sm rounded-lg p-2 border border-white/20 flex flex-col items-center">
+          <div className="text-center bg-gradient-to-r from-orange-500/20 to-yellow-500/20 backdrop-blur-sm rounded-lg p-2 border border-orange-400/30 flex flex-col items-center">
             <div className="flex items-center justify-center space-x-1 mb-1">
               <Sunrise className="w-3 h-3 text-orange-300" />
               <span className="text-xs font-semibold text-orange-200">
                 Sunrise
               </span>
             </div>
-            <div className="text-sm font-bold text-white">
+            <div className="text-xs font-bold text-white">
               {weather.sunrise}
             </div>
           </div>
 
           {/* Sunset */}
-          <div className="text-center bg-white/10 backdrop-blur-sm rounded-lg p-2 border border-white/20 flex flex-col items-center">
+          <div className="text-center bg-gradient-to-r from-red-500/20 to-pink-500/20 backdrop-blur-sm rounded-lg p-2 border border-red-400/30 flex flex-col items-center">
             <div className="flex items-center justify-center space-x-1 mb-1">
               <Sunset className="w-3 h-3 text-red-300" />
               <span className="text-xs font-semibold text-red-200">Sunset</span>
             </div>
-            <div className="text-sm font-bold text-white">{weather.sunset}</div>
+            <div className="text-xs font-bold text-white">{weather.sunset}</div>
+          </div>
+
+          {/* Precipitation */}
+          <div className="text-center bg-gradient-to-r from-blue-500/20 to-purple-500/20 backdrop-blur-sm rounded-lg p-2 border border-blue-400/30 flex flex-col items-center">
+            <div className="flex items-center justify-center space-x-1 mb-1">
+              <CloudRain className="w-3 h-3 text-blue-300" />
+              <span className="text-xs font-semibold text-blue-200">Rain</span>
+            </div>
+            <div className="text-xs font-bold text-white">
+              {weather.precipitation > 0 ? `${weather.precipitation}%` : "0%"}
+            </div>
+          </div>
+
+          {/* Hourly Precipitation Forecast */}
+          <div className="text-center bg-gradient-to-r from-blue-500/20 to-purple-500/20 backdrop-blur-sm rounded-lg p-2 border border-blue-400/30 flex flex-col items-center">
+            <div className="flex items-center justify-center space-x-1 mb-1">
+              <CloudRain className="w-3 h-3 text-blue-300" />
+              <span className="text-xs font-semibold text-blue-200">
+                Hourly
+              </span>
+            </div>
+            <div className="flex space-x-1">
+              {weather.hourlyPrecipitation?.slice(0, 4).map((hour, index) => (
+                <div key={index} className="text-center">
+                  <div className="text-xs text-blue-200 mb-1 font-medium">
+                    {hour.time}
+                  </div>
+                  <div className="text-xs font-bold text-white">
+                    {hour.precipitation}%
+                  </div>
+                </div>
+              ))}
+            </div>
           </div>
         </div>
       </div>

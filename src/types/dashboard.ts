@@ -3,13 +3,14 @@ export interface MBTAPrediction {
   departureTime: string;
   direction: number;
   headsign: string;
+  dataSource?: "realtime" | "scheduled";
 }
 
 export interface MBTAStop {
   stopId: string;
   stopName: string;
   predictions: MBTAPrediction[];
-  dataSource: "realtime" | "scheduled" | "cached";
+  dataSource: "realtime" | "scheduled" | "cached" | "mixed";
 }
 
 export interface BluebikesStation {
