@@ -12,7 +12,7 @@ import {
   Radio,
 } from "lucide-react";
 import { useState, useEffect, useCallback } from "react";
-import { formatDistanceToNow } from "date-fns";
+import Image from "next/image";
 
 interface SpotifyCardProps {
   playerState: SpotifyPlayerState | null;
@@ -66,8 +66,8 @@ export default function SpotifyCard({ playerState }: SpotifyCardProps) {
       setIsLoading(true);
       try {
         let endpoint = "";
-        let method = "POST";
-        let body: any = {};
+        const method = "POST";
+        let body: { volume?: number } = {};
 
         switch (action) {
           case "play":
@@ -231,10 +231,13 @@ export default function SpotifyCard({ playerState }: SpotifyCardProps) {
             <div className="mb-4 flex justify-center">
               <div className="relative">
                 <div className="absolute inset-0 bg-purple-500/20 rounded-2xl blur-xl"></div>
-                <img
+                <Image
                   src={track.albumArtUrl}
                   alt={track.album}
+                  width={192}
+                  height={192}
                   className="w-48 h-48 rounded-2xl shadow-2xl relative z-10 object-cover"
+                  unoptimized
                 />
               </div>
             </div>

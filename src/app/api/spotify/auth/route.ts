@@ -1,6 +1,5 @@
 import { NextResponse } from "next/server";
 import { SpotifyService } from "@/lib/services/spotify-service";
-import { cookies } from "next/headers";
 
 export async function GET() {
   try {
