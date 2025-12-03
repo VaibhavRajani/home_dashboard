@@ -1,5 +1,9 @@
 import { BaseService } from "./base-service";
-import { SpotifyPlayerState, SpotifyTrack } from "@/types/dashboard";
+import {
+  SpotifyPlayerState,
+  SpotifyTrack,
+  SpotifyDevice,
+} from "@/types/dashboard";
 import { CACHE_TTL } from "../constants";
 import { env } from "@/config/env";
 import axios from "axios";
@@ -141,6 +145,7 @@ export class SpotifyService extends BaseService {
           track: null,
           device: response.data?.device
             ? {
+                id: response.data.device.id,
                 name: response.data.device.name,
                 type: response.data.device.type,
                 volume: response.data.device.volume_percent,
@@ -169,6 +174,7 @@ export class SpotifyService extends BaseService {
         track,
         device: response.data.device
           ? {
+              id: response.data.device.id,
               name: response.data.device.name,
               type: response.data.device.type,
               volume: response.data.device.volume_percent,
@@ -272,19 +278,86 @@ export class SpotifyService extends BaseService {
     );
   }
 
-  async setVolume(volume: number, token?: string): Promise<void> {
+  async setVolume(
+    volume: number,
+    token?: string,
+    deviceId?: string
+  ): Promise<void> {
     const accessToken = token || (await this.getAccessToken());
     if (!accessToken) throw new Error("Not authenticated");
 
+    const params = new URLSearchParams({
+      volume_percent: Math.max(0, Math.min(100, volume)).toString(),
+    });
+    if (deviceId) {
+      params.append("device_id", deviceId);
+    }
+
     await axios.put(
-      `https://api.spotify.com/v1/me/player/volume?volume_percent=${Math.max(
-        0,
-        Math.min(100, volume)
-      )}`,
+      `https://api.spotify.com/v1/me/player/volume?${params.toString()}`,
       {},
       {
         headers: {
           Authorization: `Bearer ${accessToken}`,
+        },
+      }
+    );
+  }
+
+  async getDevices(token?: string): Promise<SpotifyDevice[]> {
+    const accessToken = token || (await this.getAccessToken());
+    if (!accessToken) throw new Error("Not authenticated");
+
+    try {
+      const response = await axios.get<{
+        devices: Array<{
+          id: string;
+          name: string;
+          type: string;
+          volume_percent: number;
+          is_active: boolean;
+          is_restricted: boolean;
+          supports_volume: boolean;
+        }>;
+      }>("https://api.spotify.com/v1/me/player/devices", {
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+        },
+      });
+
+      return response.data.devices.map((device) => ({
+        id: device.id,
+        name: device.name,
+        type: device.type,
+        volume: device.volume_percent,
+        isActive: device.is_active,
+        isRestricted: device.is_restricted,
+        supportsVolume: device.supports_volume,
+      }));
+    } catch (error: unknown) {
+      const axiosError = error as { response?: { status?: number } };
+      if (axiosError.response?.status === 401) {
+        this.accessToken = null;
+        throw new Error("Not authenticated");
+      }
+      throw error;
+    }
+  }
+
+  async transferPlayback(deviceId: string, token?: string): Promise<void> {
+    const accessToken = token || (await this.getAccessToken());
+    if (!accessToken) throw new Error("Not authenticated");
+
+    await axios.put(
+      "https://api.spotify.com/v1/me/player",
+      {
+        device_ids: [deviceId],
+        play: false, // Don't auto-play, just transfer
+      },
+      {
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+          "Content-Type": "application/json",
         },
       }
     );

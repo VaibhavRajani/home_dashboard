@@ -15,23 +15,23 @@ export async function POST(request: Request) {
     }
 
     const body = await request.json();
-    const { volume, deviceId } = body;
+    const { deviceId } = body;
 
-    if (typeof volume !== "number" || volume < 0 || volume > 100) {
+    if (!deviceId || typeof deviceId !== "string") {
       return NextResponse.json(
-        { error: "Invalid volume (0-100)" },
+        { error: "Invalid device ID" },
         { status: 400 }
       );
     }
 
     const spotifyService = SpotifyService.getInstance();
-    await spotifyService.setVolume(volume, token, deviceId);
+    await spotifyService.transferPlayback(deviceId, token);
 
     return NextResponse.json({ success: true });
   } catch (error) {
-    console.error("Error setting volume:", error);
+    console.error("Error transferring playback:", error);
     return NextResponse.json(
-      { error: "Failed to set volume" },
+      { error: "Failed to transfer playback" },
       { status: 500 }
     );
   }

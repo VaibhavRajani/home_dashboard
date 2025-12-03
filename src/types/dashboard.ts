@@ -64,9 +64,20 @@ export interface SpotifyTrack {
   uri: string;
 }
 
+export interface SpotifyDevice {
+  id: string;
+  name: string;
+  type: string;
+  volume: number;
+  isActive: boolean;
+  isRestricted: boolean;
+  supportsVolume: boolean;
+}
+
 export interface SpotifyPlayerState {
   track: SpotifyTrack | null;
   device: {
+    id: string;
     name: string;
     type: string;
     volume: number;

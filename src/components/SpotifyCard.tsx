@@ -1,6 +1,6 @@
 "use client";
 
-import { SpotifyPlayerState } from "@/types/dashboard";
+import { SpotifyPlayerState, SpotifyDevice } from "@/types/dashboard";
 import {
   Music,
   Play,
@@ -10,6 +10,7 @@ import {
   Volume2,
   LogIn,
   Radio,
+  ChevronDown,
 } from "lucide-react";
 import { useState, useEffect, useCallback } from "react";
 import Image from "next/image";
@@ -24,6 +25,9 @@ export default function SpotifyCard({ playerState }: SpotifyCardProps) {
     playerState
   );
   const [progress, setProgress] = useState(0);
+  const [devices, setDevices] = useState<SpotifyDevice[]>([]);
+  const [showDeviceSelector, setShowDeviceSelector] = useState(false);
+  const [isLoadingDevices, setIsLoadingDevices] = useState(false);
 
   // Update local state when prop changes
   useEffect(() => {
@@ -49,6 +53,81 @@ export default function SpotifyCard({ playerState }: SpotifyCardProps) {
     return () => clearInterval(interval);
   }, [localState?.track?.isPlaying, localState?.track?.duration]);
 
+  // Fetch devices when authenticated
+  useEffect(() => {
+    if (localState?.isAuthenticated) {
+      fetchDevices();
+    }
+  }, [localState?.isAuthenticated]);
+
+  // Close device selector when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      const target = event.target as HTMLElement;
+      if (
+        showDeviceSelector &&
+        !target.closest('[data-device-selector]')
+      ) {
+        setShowDeviceSelector(false);
+      }
+    };
+
+    if (showDeviceSelector) {
+      document.addEventListener("mousedown", handleClickOutside);
+      return () => {
+        document.removeEventListener("mousedown", handleClickOutside);
+      };
+    }
+  }, [showDeviceSelector]);
+
+  const fetchDevices = async () => {
+    setIsLoadingDevices(true);
+    try {
+      const response = await fetch("/api/spotify/devices");
+      if (response.ok) {
+        const data = await response.json();
+        setDevices(data.devices || []);
+      }
+    } catch (error) {
+      console.error("Error fetching devices:", error);
+    } finally {
+      setIsLoadingDevices(false);
+    }
+  };
+
+  const handleTransferDevice = async (deviceId: string) => {
+    setIsLoading(true);
+    try {
+      const response = await fetch("/api/spotify/transfer", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ deviceId }),
+      });
+
+      if (response.ok) {
+        setShowDeviceSelector(false);
+        // Refresh player state after transfer
+        setTimeout(async () => {
+          try {
+            const stateResponse = await fetch("/api/spotify/player");
+            if (stateResponse.ok) {
+              const newState = await stateResponse.json();
+              setLocalState(newState);
+            }
+          } catch (error) {
+            console.error("Error refreshing state:", error);
+          }
+        }, 500);
+      }
+    } catch (error) {
+      console.error("Error transferring device:", error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   const handleAuth = async () => {
     try {
       const response = await fetch("/api/spotify/auth");
@@ -62,12 +141,16 @@ export default function SpotifyCard({ playerState }: SpotifyCardProps) {
   };
 
   const handlePlayerAction = useCallback(
-    async (action: "play" | "pause" | "next" | "previous" | "volume", volume?: number) => {
+    async (
+      action: "play" | "pause" | "next" | "previous" | "volume",
+      volume?: number,
+      deviceId?: string
+    ) => {
       setIsLoading(true);
       try {
         let endpoint = "";
         const method = "POST";
-        let body: { volume?: number } = {};
+        let body: { volume?: number; deviceId?: string } = {};
 
         switch (action) {
           case "play":
@@ -84,7 +167,7 @@ export default function SpotifyCard({ playerState }: SpotifyCardProps) {
             break;
           case "volume":
             endpoint = "/api/spotify/player/volume";
-            body = { volume };
+            body = { volume, deviceId };
             break;
         }
 
@@ -174,13 +257,72 @@ export default function SpotifyCard({ playerState }: SpotifyCardProps) {
             </div>
           </div>
 
-          {/* Device Info */}
-          {localState?.device && (
-            <div className="flex items-center space-x-2">
-              <Radio className="w-3 h-3 text-purple-200" />
-              <span className="text-xs text-purple-100 truncate max-w-[100px]">
-                {localState.device.name}
-              </span>
+          {/* Device Selector */}
+          {isAuthenticated && (
+            <div className="relative" data-device-selector>
+              <button
+                onClick={() => {
+                  setShowDeviceSelector(!showDeviceSelector);
+                  if (!showDeviceSelector) {
+                    fetchDevices();
+                  }
+                }}
+                className="flex items-center space-x-1 text-xs text-purple-100 hover:text-white transition-colors"
+                disabled={isLoadingDevices}
+              >
+                <Radio className="w-3 h-3" />
+                <span className="truncate max-w-[80px]">
+                  {localState?.device?.name || "Select Device"}
+                </span>
+                <ChevronDown className="w-3 h-3" />
+              </button>
+
+              {/* Device Dropdown */}
+              {showDeviceSelector && (
+                <div className="absolute right-0 top-full mt-2 bg-slate-800 rounded-lg shadow-xl border border-purple-500/30 min-w-[200px] max-h-[200px] overflow-y-auto z-20">
+                  {isLoadingDevices ? (
+                    <div className="p-3 text-center text-purple-300 text-xs">
+                      Loading devices...
+                    </div>
+                  ) : devices.length === 0 ? (
+                    <div className="p-3 text-center text-purple-300 text-xs">
+                      No devices found
+                    </div>
+                  ) : (
+                    devices.map((device) => (
+                      <button
+                        key={device.id}
+                        onClick={() => {
+                          if (device.id !== localState?.device?.id) {
+                            handleTransferDevice(device.id);
+                          } else {
+                            setShowDeviceSelector(false);
+                          }
+                        }}
+                        className={`w-full text-left px-3 py-2 text-xs hover:bg-purple-500/20 transition-colors flex items-center justify-between ${
+                          device.id === localState?.device?.id
+                            ? "bg-purple-500/30 text-white"
+                            : "text-purple-200"
+                        } ${device.isRestricted ? "opacity-50 cursor-not-allowed" : ""}`}
+                        disabled={device.isRestricted || isLoading}
+                      >
+                        <div className="flex items-center space-x-2 flex-1 min-w-0">
+                          <Radio className="w-3 h-3 flex-shrink-0" />
+                          <div className="flex-1 min-w-0">
+                            <div className="truncate font-medium">
+                              {device.name}
+                            </div>
+                            <div className="text-purple-400 text-[10px]">
+                              {device.type}
+                              {device.isActive && " • Active"}
+                            </div>
+                          </div>
+                        </div>
+                      </button>
+                    ))
+                  )}
+                </div>
+              )}
             </div>
           )}
         </div>
@@ -211,9 +353,21 @@ export default function SpotifyCard({ playerState }: SpotifyCardProps) {
             <p className="text-gray-300 text-lg font-semibold mb-2">
               No Active Device
             </p>
-            <p className="text-gray-400 text-sm">
-              Start playing music on a Spotify device to control it here
+            <p className="text-gray-400 text-sm mb-4">
+              Select a device to start playing
             </p>
+            <button
+              onClick={() => {
+                setShowDeviceSelector(!showDeviceSelector);
+                if (!showDeviceSelector) {
+                  fetchDevices();
+                }
+              }}
+              className="bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white px-4 py-2 rounded-lg transition-all duration-200 shadow-lg hover:shadow-xl flex items-center space-x-2 text-sm font-medium"
+            >
+              <Radio className="w-4 h-4" />
+              <span>Select Device</span>
+            </button>
           </div>
         ) : !track ? (
           <div className="flex-1 flex flex-col items-center justify-center text-center py-8">
@@ -310,7 +464,11 @@ export default function SpotifyCard({ playerState }: SpotifyCardProps) {
                   max="100"
                   value={localState.device.volume}
                   onChange={(e) =>
-                    handlePlayerAction("volume", parseInt(e.target.value))
+                    handlePlayerAction(
+                      "volume",
+                      parseInt(e.target.value),
+                      localState.device?.id
+                    )
                   }
                   className="flex-1 h-2 bg-slate-700/50 rounded-lg appearance-none cursor-pointer accent-purple-500"
                 />

@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import { SpotifyService } from "@/lib/services/spotify-service";
 import { cookies } from "next/headers";
 
-export async function POST(request: Request) {
+export async function GET() {
   try {
     const cookieStore = await cookies();
     const token = cookieStore.get("spotify_token")?.value;
@@ -14,24 +14,14 @@ export async function POST(request: Request) {
       );
     }
 
-    const body = await request.json();
-    const { volume, deviceId } = body;
-
-    if (typeof volume !== "number" || volume < 0 || volume > 100) {
-      return NextResponse.json(
-        { error: "Invalid volume (0-100)" },
-        { status: 400 }
-      );
-    }
-
     const spotifyService = SpotifyService.getInstance();
-    await spotifyService.setVolume(volume, token, deviceId);
+    const devices = await spotifyService.getDevices(token);
 
-    return NextResponse.json({ success: true });
+    return NextResponse.json({ devices });
   } catch (error) {
-    console.error("Error setting volume:", error);
+    console.error("Error fetching devices:", error);
     return NextResponse.json(
-      { error: "Failed to set volume" },
+      { error: "Failed to fetch devices" },
       { status: 500 }
     );
   }

@@ -8,7 +8,6 @@ import {
 import { MBTAService } from "./mbta-service";
 import { BluebikesService } from "./bluebikes-service";
 import { WeatherService } from "./weather-service";
-import { SpotifyService } from "./spotify-service";
 import { BaseService } from "./base-service";
 import { CACHE_TTL } from "../constants";
 import { env } from "@/config/env";
@@ -18,7 +17,6 @@ export class DashboardService extends BaseService {
   private mbtaService: MBTAService;
   private bluebikesService: BluebikesService;
   private weatherService: WeatherService;
-  private spotifyService: SpotifyService;
 
   protected readonly cacheKey = "DASHBOARD" as const;
   protected readonly rateLimitKey = "DASHBOARD_API" as const;
@@ -29,7 +27,6 @@ export class DashboardService extends BaseService {
     this.mbtaService = MBTAService.getInstance();
     this.bluebikesService = BluebikesService.getInstance();
     this.weatherService = WeatherService.getInstance();
-    this.spotifyService = SpotifyService.getInstance();
   }
 
   static getInstance(): DashboardService {
