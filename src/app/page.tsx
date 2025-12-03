@@ -1,11 +1,13 @@
 "use client";
 
 import { useDashboardData } from "@/hooks/useDashboardData";
+import { useSpotifyPlayer } from "@/hooks/useSpotifyPlayer";
 import LoadingSpinner from "@/components/ui/LoadingSpinner";
 import ErrorDisplay from "@/components/ui/ErrorDisplay";
 import WeatherCard from "@/components/WeatherCard";
 import TransitCard from "@/components/TransitCard";
 import BikesCard from "@/components/BikesCard";
+import SpotifyCard from "@/components/SpotifyCard";
 import { RefreshCw } from "lucide-react";
 import { env } from "@/config/env";
 
@@ -18,6 +20,8 @@ export default function HomePage() {
     ), // Use the fastest refresh interval
     autoRefresh: true,
   });
+
+  const { playerState: spotifyState } = useSpotifyPlayer();
 
   if (loading && !data) {
     return (
@@ -52,9 +56,19 @@ export default function HomePage() {
           <TransitCard stops={data?.mbta || []} alerts={data?.alerts || []} />
         </div>
 
-        {/* Bluebikes Card - Narrower */}
-        <div className="flex-1">
-          <BikesCard stations={data?.bikes || []} />
+        {/* Right Column - Bluebikes and Spotify */}
+        <div className="flex-1 flex flex-col gap-4">
+          {/* Bluebikes Card */}
+          <div className="flex-1">
+            <BikesCard stations={data?.bikes || []} />
+          </div>
+
+          {/* Spotify Card */}
+          {env.ENABLE_SPOTIFY && (
+            <div className="flex-1">
+              <SpotifyCard playerState={spotifyState} />
+            </div>
+          )}
         </div>
       </div>
 
@@ -80,6 +94,14 @@ export default function HomePage() {
                   Weather
                 </span>
               </div>
+              {env.ENABLE_SPOTIFY && (
+                <div className="flex items-center space-x-1">
+                  <div className="w-1.5 h-1.5 bg-pink-500 rounded-full animate-pulse"></div>
+                  <span className="text-xs font-medium text-gray-700">
+                    Spotify
+                  </span>
+                </div>
+              )}
             </div>
 
             {/* Last Updated */}

@@ -4,10 +4,12 @@ import {
   MBTAStop,
   WeatherData,
   MBTAAlert,
+  SpotifyPlayerState,
 } from "@/types/dashboard";
 import { MBTAService } from "./mbta-service";
 import { BluebikesService } from "./bluebikes-service";
 import { WeatherService } from "./weather-service";
+import { SpotifyService } from "./spotify-service";
 import { BaseService } from "./base-service";
 import { CACHE_TTL } from "../constants";
 import { env } from "@/config/env";
@@ -17,6 +19,7 @@ export class DashboardService extends BaseService {
   private mbtaService: MBTAService;
   private bluebikesService: BluebikesService;
   private weatherService: WeatherService;
+  private spotifyService: SpotifyService;
 
   protected readonly cacheKey = "DASHBOARD" as const;
   protected readonly rateLimitKey = "DASHBOARD_API" as const;
@@ -27,6 +30,7 @@ export class DashboardService extends BaseService {
     this.mbtaService = MBTAService.getInstance();
     this.bluebikesService = BluebikesService.getInstance();
     this.weatherService = WeatherService.getInstance();
+    this.spotifyService = SpotifyService.getInstance();
   }
 
   static getInstance(): DashboardService {
@@ -90,11 +94,14 @@ export class DashboardService extends BaseService {
       const alertsData =
         (results.find((r) => r.type === "alerts")?.data as MBTAAlert[]) || [];
 
+      // Spotify is handled separately via API routes, so we don't fetch it here
+      // It's fetched client-side for real-time updates
       const dashboardData: DashboardData = {
         mbta: mbtaData,
         bikes: bikesData,
         weather: weatherData,
         alerts: alertsData,
+        spotify: null, // Spotify is fetched separately
         lastUpdated: new Date().toISOString(),
       };
 
@@ -128,6 +135,7 @@ export class DashboardService extends BaseService {
       bikes: [],
       weather: null,
       alerts: [],
+      spotify: null,
       lastUpdated: new Date().toISOString(),
     };
   }

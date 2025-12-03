@@ -52,10 +52,34 @@ export interface WeatherData {
   }>;
 }
 
+export interface SpotifyTrack {
+  id: string;
+  name: string;
+  artist: string;
+  album: string;
+  albumArtUrl: string;
+  duration: number;
+  progress: number;
+  isPlaying: boolean;
+  uri: string;
+}
+
+export interface SpotifyPlayerState {
+  track: SpotifyTrack | null;
+  device: {
+    name: string;
+    type: string;
+    volume: number;
+  } | null;
+  isConnected: boolean;
+  isAuthenticated: boolean;
+}
+
 export interface DashboardData {
   mbta: MBTAStop[];
   bikes: BluebikesStation[];
   weather: WeatherData | null;
+  spotify: SpotifyPlayerState | null;
   lastUpdated: string;
   alerts: MBTAAlert[];
 }

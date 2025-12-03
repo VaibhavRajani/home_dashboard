@@ -1,5 +1,31 @@
 This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
 
+## Features
+
+- **MBTA Transit**: Real-time Green Line (C & D) predictions for Washington Square and Beaconsfield stops
+- **Bluebikes**: Station availability for Washington Square area
+- **Weather**: Current weather conditions
+- **Spotify**: Music player controls for your Spotify account
+
+## Environment Variables
+
+### Spotify Setup
+
+To enable Spotify integration:
+
+1. Create a Spotify app at [Spotify Developer Dashboard](https://developer.spotify.com/dashboard)
+2. Add the following environment variables to your `.env.local`:
+
+```env
+SPOTIFY_CLIENT_ID=your_client_id
+SPOTIFY_CLIENT_SECRET=your_client_secret
+SPOTIFY_REDIRECT_URI=http://localhost:3000/api/spotify/callback
+NEXT_PUBLIC_ENABLE_SPOTIFY=true
+```
+
+3. In your Spotify app settings, add `http://localhost:3000/api/spotify/callback` (or your production URL) to the Redirect URIs
+4. The required scopes are automatically requested: `user-read-playback-state`, `user-modify-playback-state`, `user-read-currently-playing`
+
 ## Getting Started
 
 First, run the development server:
