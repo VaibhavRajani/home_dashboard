@@ -191,7 +191,10 @@ export class SpotifyService extends BaseService {
       }
 
       // Device not active or no playback
-      if (axiosError.response?.status === 204 || axiosError.response?.status === 404) {
+      if (
+        axiosError.response?.status === 204 ||
+        axiosError.response?.status === 404
+      ) {
         return {
           track: null,
           device: null,
