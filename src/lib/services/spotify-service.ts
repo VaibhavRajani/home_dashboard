@@ -177,8 +177,9 @@ export class SpotifyService extends BaseService {
         isConnected: response.data.device?.is_active || false,
         isAuthenticated: true,
       };
-    } catch (error: any) {
-      if (error.response?.status === 401) {
+    } catch (error: unknown) {
+      const axiosError = error as { response?: { status?: number } };
+      if (axiosError.response?.status === 401) {
         // Token expired or invalid
         this.accessToken = null;
         return {
@@ -190,7 +191,7 @@ export class SpotifyService extends BaseService {
       }
 
       // Device not active or no playback
-      if (error.response?.status === 204 || error.response?.status === 404) {
+      if (axiosError.response?.status === 204 || axiosError.response?.status === 404) {
         return {
           track: null,
           device: null,

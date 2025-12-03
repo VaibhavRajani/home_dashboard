@@ -4,7 +4,6 @@ import {
   MBTAStop,
   WeatherData,
   MBTAAlert,
-  SpotifyPlayerState,
 } from "@/types/dashboard";
 import { MBTAService } from "./mbta-service";
 import { BluebikesService } from "./bluebikes-service";
