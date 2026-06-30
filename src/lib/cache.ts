@@ -44,6 +44,5 @@ export const CACHE_KEYS = {
   MBTA_ALERTS: "mbta_alerts_data",
   BLUEBIKES: "bluebikes_data",
   WEATHER: "weather_data",
-  SPOTIFY: "spotify_data",
   DASHBOARD: "dashboard_data",
 } as const;

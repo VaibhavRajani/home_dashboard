@@ -90,14 +90,11 @@ export class DashboardService extends BaseService {
       const alertsData =
         (results.find((r) => r.type === "alerts")?.data as MBTAAlert[]) || [];
 
-      // Spotify is handled separately via API routes, so we don't fetch it here
-      // It's fetched client-side for real-time updates
       const dashboardData: DashboardData = {
         mbta: mbtaData,
         bikes: bikesData,
         weather: weatherData,
         alerts: alertsData,
-        spotify: null, // Spotify is fetched separately
         lastUpdated: new Date().toISOString(),
       };
 
@@ -131,7 +128,6 @@ export class DashboardService extends BaseService {
       bikes: [],
       weather: null,
       alerts: [],
-      spotify: null,
       lastUpdated: new Date().toISOString(),
     };
   }
