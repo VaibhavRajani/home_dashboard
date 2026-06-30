@@ -1,148 +1,128 @@
 "use client";
 
-import { useDashboardData } from "@/hooks/useDashboardData";
-import { useSpotifyPlayer } from "@/hooks/useSpotifyPlayer";
-import LoadingSpinner from "@/components/ui/LoadingSpinner";
-import ErrorDisplay from "@/components/ui/ErrorDisplay";
-import WeatherCard from "@/components/WeatherCard";
-import TransitCard from "@/components/TransitCard";
-import BikesCard from "@/components/BikesCard";
-import SpotifyCard from "@/components/SpotifyCard";
-import { RefreshCw } from "lucide-react";
-import { env } from "@/config/env";
+import { AlertTriangle, RefreshCw } from "lucide-react";
+import CryptoCard, { CryptoCardSkeleton } from "@/components/CryptoCard";
+import { useCryptoMarkets } from "@/hooks/useCryptoMarkets";
+
+const SKELETON_PLACEHOLDERS = [0, 1, 2, 3];
 
 export default function HomePage() {
-  const { data, loading, error, refetch, lastUpdated } = useDashboardData({
-    refreshInterval: Math.min(
-      env.MBTA_REFRESH_INTERVAL,
-      env.BIKES_REFRESH_INTERVAL,
-      env.WEATHER_REFRESH_INTERVAL
-    ), // Use the fastest refresh interval
-    autoRefresh: true,
-  });
+  const { coins, loading, refreshing, error, lastUpdated, refetch } =
+    useCryptoMarkets({ refreshInterval: 60_000, autoRefresh: true });
 
-  const { playerState: spotifyState } = useSpotifyPlayer();
+  const isInitialLoading = loading && !coins;
+  const showCards = coins && coins.length > 0;
 
-  if (loading && !data) {
-    return (
-      <div className="h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center">
-        <div className="text-center">
-          <LoadingSpinner size="lg" />
-          <p className="mt-4 text-gray-600 text-lg">Loading Dashboard...</p>
-        </div>
-      </div>
-    );
-  }
-
-  if (error) {
-    return (
-      <div className="h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center p-4">
-        <ErrorDisplay error={error} onRetry={refetch} />
-      </div>
-    );
-  }
+  const lastUpdatedLabel = lastUpdated
+    ? lastUpdated.toLocaleTimeString([], {
+        hour: "2-digit",
+        minute: "2-digit",
+        second: "2-digit",
+      })
+    : "—";
 
   return (
-    <div className="h-screen bg-gradient-to-br from-blue-50 to-indigo-100 p-4 flex flex-col">
-      {/* Weather Card - Compact Height */}
-      <div className="h-[15vh] mb-4">
-        <WeatherCard weather={data?.weather || null} />
-      </div>
-
-      {/* Main Content - Side by Side Cards */}
-      <div className="flex gap-4 flex-1 min-h-0">
-        {/* MBTA Card - Takes up more space */}
-        <div className="flex-[2]">
-          <TransitCard stops={data?.mbta || []} alerts={data?.alerts || []} />
+    <main className="flex h-screen w-screen flex-col overflow-hidden bg-slate-950 text-slate-100">
+      <header className="flex items-center justify-between px-6 py-4 sm:px-8">
+        <div className="flex items-center gap-3">
+          <span
+            className="inline-flex h-2.5 w-2.5 rounded-full bg-emerald-400 shadow-[0_0_10px_rgba(52,211,153,0.8)]"
+            aria-hidden="true"
+          />
+          <h1 className="text-xl font-semibold tracking-tight text-white sm:text-2xl">
+            Crypto Markets
+          </h1>
+          <span className="hidden text-xs font-medium uppercase tracking-[0.2em] text-slate-500 sm:inline">
+            Live · USD
+          </span>
         </div>
 
-        {/* Right Column - Bluebikes and Spotify */}
-        <div className="flex-1 flex flex-col gap-4">
-          {/* Bluebikes Card */}
-          <div className="flex-1">
-            <BikesCard stations={data?.bikes || []} />
-          </div>
+        <button
+          type="button"
+          onClick={refetch}
+          disabled={refreshing}
+          className="group inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-3 py-1.5 text-xs font-medium text-slate-300 transition hover:bg-white/10 disabled:opacity-60"
+          aria-label={
+            lastUpdated
+              ? `Refresh market data. Last updated at ${lastUpdatedLabel}`
+              : "Refresh market data"
+          }
+        >
+          <RefreshCw
+            className={`h-3.5 w-3.5 ${refreshing ? "animate-spin" : "transition-transform group-hover:rotate-90"}`}
+            aria-hidden="true"
+          />
+          <span className="tabular-nums">
+            <span className="text-slate-500">Updated</span>{" "}
+            <span className="text-slate-200">{lastUpdatedLabel}</span>
+          </span>
+        </button>
+      </header>
 
-          {/* Spotify Card */}
-          {env.ENABLE_SPOTIFY && (
-            <div className="flex-1">
-              <SpotifyCard playerState={spotifyState} />
-            </div>
-          )}
-        </div>
-      </div>
-
-      {/* Footer with Last Updated and Refresh Button */}
-      <div className="mt-2 bg-white/60 backdrop-blur-md rounded-lg p-2 border border-white/30 shadow-lg">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center space-x-3">
-            {/* Status Indicators */}
-            <div className="flex items-center space-x-2">
-              <div className="flex items-center space-x-1">
-                <div className="w-1.5 h-1.5 bg-green-500 rounded-full animate-pulse"></div>
-                <span className="text-xs font-medium text-gray-700">MBTA</span>
-              </div>
-              <div className="flex items-center space-x-1">
-                <div className="w-1.5 h-1.5 bg-blue-500 rounded-full animate-pulse"></div>
-                <span className="text-xs font-medium text-gray-700">
-                  Bluebikes
+      <section className="flex flex-1 min-h-0 flex-col px-6 pb-6 sm:px-8 sm:pb-8">
+        {error && !showCards ? (
+          <FallbackPanel error={error} onRetry={refetch} retrying={refreshing} />
+        ) : (
+          <>
+            {error && showCards && (
+              <div
+                role="status"
+                className="mb-3 flex items-center gap-2 rounded-lg border border-amber-500/30 bg-amber-500/10 px-3 py-2 text-xs text-amber-300"
+              >
+                <AlertTriangle className="h-3.5 w-3.5" aria-hidden="true" />
+                <span>
+                  Showing last known values — failed to refresh: {error}
                 </span>
               </div>
-              <div className="flex items-center space-x-1">
-                <div className="w-1.5 h-1.5 bg-purple-500 rounded-full animate-pulse"></div>
-                <span className="text-xs font-medium text-gray-700">
-                  Weather
-                </span>
-              </div>
-              {env.ENABLE_SPOTIFY && (
-                <div className="flex items-center space-x-1">
-                  <div className="w-1.5 h-1.5 bg-pink-500 rounded-full animate-pulse"></div>
-                  <span className="text-xs font-medium text-gray-700">
-                    Spotify
-                  </span>
-                </div>
-              )}
-            </div>
+            )}
 
-            {/* Last Updated */}
-            <div className="text-xs text-gray-600 border-l border-gray-300 pl-2">
-              Last updated:{" "}
-              <span className="font-medium">
-                {lastUpdated
-                  ? new Date(lastUpdated).toLocaleTimeString()
-                  : "Never"}
-              </span>
-            </div>
-          </div>
-
-          {/* Action Buttons */}
-          <div className="flex items-center space-x-2">
-            {/* Pays Rent Button */}
-            <a
-              href="https://rent683.vercel.app"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="flex items-center space-x-1 bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white px-2 py-1 rounded-md transition-all duration-200 shadow-sm hover:shadow-md text-xs font-medium"
+            <div
+              className="grid min-h-0 flex-1 grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4"
+              aria-busy={isInitialLoading}
             >
-              <span>💰</span>
-              <span>Pay Rent</span>
-            </a>
+              {isInitialLoading
+                ? SKELETON_PLACEHOLDERS.map((i) => <CryptoCardSkeleton key={i} />)
+                : coins?.map((coin) => <CryptoCard key={coin.id} coin={coin} />)}
+            </div>
+          </>
+        )}
+      </section>
+    </main>
+  );
+}
 
-            {/* Refresh Button */}
-            <button
-              onClick={refetch}
-              disabled={loading}
-              className="flex items-center space-x-1 bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 disabled:from-gray-400 disabled:to-gray-500 text-white px-2 py-1 rounded-md transition-all duration-200 shadow-sm hover:shadow-md disabled:shadow-none text-xs"
-            >
-              <RefreshCw
-                className={`w-3 h-3 ${loading ? "animate-spin" : ""}`}
-              />
-              <span className="font-medium">
-                {loading ? "Refreshing..." : "Refresh"}
-              </span>
-            </button>
-          </div>
-        </div>
+function FallbackPanel({
+  error,
+  onRetry,
+  retrying,
+}: {
+  error: string;
+  onRetry: () => void;
+  retrying: boolean;
+}) {
+  return (
+    <div className="flex flex-1 items-center justify-center">
+      <div className="max-w-md rounded-2xl border border-rose-500/20 bg-rose-500/5 p-6 text-center">
+        <AlertTriangle
+          className="mx-auto h-8 w-8 text-rose-400"
+          aria-hidden="true"
+        />
+        <h2 className="mt-3 text-lg font-semibold text-white">
+          Market data unavailable
+        </h2>
+        <p className="mt-1 text-sm text-slate-400">{error}</p>
+        <button
+          type="button"
+          onClick={onRetry}
+          disabled={retrying}
+          className="mt-4 inline-flex items-center gap-2 rounded-full bg-white/10 px-4 py-1.5 text-sm font-medium text-white transition hover:bg-white/15 disabled:opacity-60"
+        >
+          <RefreshCw
+            className={`h-4 w-4 ${retrying ? "animate-spin" : ""}`}
+            aria-hidden="true"
+          />
+          {retrying ? "Retrying…" : "Try again"}
+        </button>
       </div>
     </div>
   );
