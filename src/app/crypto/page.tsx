@@ -1,10 +1,57 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import { AlertTriangle, RefreshCw } from "lucide-react";
 import CryptoCard, { CryptoCardSkeleton } from "@/components/CryptoCard";
 import { useCryptoMarkets } from "@/hooks/useCryptoMarkets";
 
 const SKELETON_PLACEHOLDERS = [0, 1, 2, 3];
+
+function DigitalClock() {
+  const [now, setNow] = useState<Date | null>(null);
+
+  useEffect(() => {
+    setNow(new Date());
+    const id = window.setInterval(() => setNow(new Date()), 1000);
+    return () => window.clearInterval(id);
+  }, []);
+
+  if (!now) {
+    return <div className="h-11 w-40" aria-hidden="true" />;
+  }
+
+  const time = now.toLocaleTimeString([], {
+    hour: "numeric",
+    minute: "2-digit",
+    second: "2-digit",
+    hour12: true,
+  });
+
+  const date = now.toLocaleDateString([], {
+    weekday: "long",
+    month: "long",
+    day: "numeric",
+    year: "numeric",
+  });
+
+  return (
+    <div className="flex flex-col items-center justify-center text-center">
+      <time
+        dateTime={now.toISOString()}
+        className="font-mono text-2xl font-semibold tracking-wide text-white tabular-nums sm:text-3xl"
+        suppressHydrationWarning
+      >
+        {time}
+      </time>
+      <span
+        className="mt-0.5 text-[11px] font-medium uppercase tracking-[0.18em] text-slate-500 sm:text-xs"
+        suppressHydrationWarning
+      >
+        {date}
+      </span>
+    </div>
+  );
+}
 
 export default function CryptoPage() {
   const { coins, loading, refreshing, error, lastUpdated, refetch } =
@@ -23,8 +70,8 @@ export default function CryptoPage() {
 
   return (
     <main className="flex h-screen w-screen flex-col overflow-hidden bg-slate-950 text-slate-100">
-      <header className="flex items-center justify-between px-6 py-4 sm:px-8">
-        <div className="flex items-center gap-3">
+      <header className="grid grid-cols-[1fr_auto_1fr] items-center gap-4 px-6 py-4 sm:px-8">
+        <div className="flex items-center gap-3 justify-self-start">
           <span
             className="inline-flex h-2.5 w-2.5 rounded-full bg-emerald-400 shadow-[0_0_10px_rgba(52,211,153,0.8)]"
             aria-hidden="true"
@@ -37,11 +84,13 @@ export default function CryptoPage() {
           </span>
         </div>
 
+        <DigitalClock />
+
         <button
           type="button"
           onClick={refetch}
           disabled={refreshing}
-          className="group inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-3 py-1.5 text-xs font-medium text-slate-300 transition hover:bg-white/10 disabled:opacity-60"
+          className="group inline-flex items-center gap-2 justify-self-end rounded-full border border-white/10 bg-white/5 px-3 py-1.5 text-xs font-medium text-slate-300 transition hover:bg-white/10 disabled:opacity-60"
           aria-label={
             lastUpdated
               ? `Refresh market data. Last updated at ${lastUpdatedLabel}`
