@@ -3,7 +3,7 @@ import type { Metadata } from "next";
 export const metadata: Metadata = {
   title: "Crypto Markets Dashboard",
   description:
-    "Kiosk-style live crypto market dashboard for BTC, ETH, ADA and LINK.",
+    "Kiosk-style live crypto market dashboard for BTC, ETH, HBAR and LINK.",
 };
 
 export const viewport = {

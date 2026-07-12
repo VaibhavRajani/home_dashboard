@@ -7,7 +7,7 @@ A Next.js dashboard built for a wall-mounted or tablet display, focused on Brook
 | Route | Description |
 | --- | --- |
 | `/` | **Home dashboard** — weather, MBTA transit, and Bluebikes |
-| `/crypto` | **Crypto kiosk** — live BTC, ETH, ADA, and LINK prices (dark full-screen UI) |
+| `/crypto` | **Crypto kiosk** — live BTC, ETH, HBAR, and LINK prices (dark full-screen UI) |
 
 ## Features
 
@@ -20,7 +20,7 @@ A Next.js dashboard built for a wall-mounted or tablet display, focused on Brook
 
 ### Crypto dashboard (`/crypto`)
 
-- Live market data for **Bitcoin**, **Ethereum**, **Cardano**, and **Chainlink**
+- Live market data for **Bitcoin**, **Ethereum**, **Hedera**, and **Chainlink**
 - Dark kiosk-style layout with price, 24h change, and high/low
 - Auto-refreshes every 60 seconds via the [CoinGecko](https://www.coingecko.com/) public API — no API key required
 

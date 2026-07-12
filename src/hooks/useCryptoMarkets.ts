@@ -6,7 +6,7 @@ import type { Coin } from "@/types/dashboard";
 const COINGECKO_MARKETS_URL =
   "https://api.coingecko.com/api/v3/coins/markets" +
   "?vs_currency=usd" +
-  "&ids=bitcoin,ethereum,cardano,chainlink" +
+  "&ids=bitcoin,ethereum,hedera,chainlink" +
   "&order=market_cap_desc" +
   "&per_page=4" +
   "&page=1" +
@@ -17,7 +17,7 @@ const COINGECKO_MARKETS_URL =
  * Preferred display order, independent of what CoinGecko returns.
  * Falls back to `market_cap_desc` ordering for any coin not listed here.
  */
-const DISPLAY_ORDER = ["bitcoin", "ethereum", "cardano", "chainlink"] as const;
+const DISPLAY_ORDER = ["bitcoin", "ethereum", "hedera", "chainlink"] as const;
 
 export interface UseCryptoMarketsOptions {
   /** Polling cadence in milliseconds. Defaults to 60s. */
