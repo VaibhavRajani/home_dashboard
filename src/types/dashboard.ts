@@ -78,3 +78,19 @@ export interface Coin {
   market_cap_rank?: number | null;
   last_updated?: string | null;
 }
+
+/**
+ * Stock quote shape used by the `/stocks` kiosk.
+ * Field names mirror the crypto card for a shared layout.
+ */
+export interface Stock {
+  id: string;
+  symbol: string;
+  name: string;
+  image: string;
+  current_price: number | null;
+  price_change_percentage_24h: number | null;
+  high_24h: number | null;
+  low_24h: number | null;
+  last_updated?: string | null;
+}

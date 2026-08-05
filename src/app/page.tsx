@@ -106,6 +106,14 @@ export default function HomePage() {
               <span>Crypto</span>
             </Link>
 
+            <Link
+              href="/stocks"
+              className="flex items-center space-x-1 bg-gradient-to-r from-sky-500 to-blue-600 hover:from-sky-600 hover:to-blue-700 text-white px-2 py-1 rounded-md transition-all duration-200 shadow-sm hover:shadow-md text-xs font-medium"
+            >
+              <span>📈</span>
+              <span>Stocks</span>
+            </Link>
+
             <button
               onClick={refetch}
               disabled={loading}

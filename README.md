@@ -8,6 +8,7 @@ A Next.js dashboard built for a wall-mounted or tablet display, focused on Brook
 | --- | --- |
 | `/` | **Home dashboard** — weather, MBTA transit, and Bluebikes |
 | `/crypto` | **Crypto kiosk** — live BTC, ETH, HBAR, and LINK prices (dark full-screen UI) |
+| `/stocks` | **Stocks kiosk** — live HUBS, NVDA, GOOGL, and SPCX prices (same dark UI) |
 
 ## Features
 
@@ -23,6 +24,12 @@ A Next.js dashboard built for a wall-mounted or tablet display, focused on Brook
 - Live market data for **Bitcoin**, **Ethereum**, **Hedera**, and **Chainlink**
 - Dark kiosk-style layout with price, 24h change, and high/low
 - Auto-refreshes every 60 seconds via the [CoinGecko](https://www.coingecko.com/) public API — no API key required
+
+### Stocks dashboard (`/stocks`)
+
+- Live market data for **HubSpot (HUBS)**, **NVIDIA (NVDA)**, **Google (GOOGL)**, and **SpaceX (SPCX)**
+- Same dark kiosk layout as crypto (2×2 cards, clock, refresh)
+- Auto-refreshes every 60 seconds via Yahoo Finance through a local `/api/stocks` proxy — no API key required
 
 ## Environment Variables
 
@@ -43,6 +50,7 @@ OPENWEATHER_API_KEY=your_openweather_api_key
 | `OPENWEATHER_API_KEY` | Only if weather enabled | Free key from [OpenWeatherMap](https://openweathermap.org/api). Also set `NEXT_PUBLIC_ENABLE_WEATHER=true` |
 | Bluebikes | No key needed | Public GBFS feed |
 | Crypto (`/crypto`) | No key needed | CoinGecko public API |
+| Stocks (`/stocks`) | No key needed | Yahoo Finance via `/api/stocks` |
 
 ### Feature flags
 
@@ -88,6 +96,7 @@ Open:
 
 - [http://localhost:3000](http://localhost:3000) — home dashboard
 - [http://localhost:3000/crypto](http://localhost:3000/crypto) — crypto kiosk
+- [http://localhost:3000/stocks](http://localhost:3000/stocks) — stocks kiosk
 
 ## Project Structure
 
@@ -96,11 +105,13 @@ src/
 ├── app/
 │   ├── page.tsx              # Home dashboard
 │   ├── crypto/page.tsx       # Crypto kiosk
+│   ├── stocks/page.tsx       # Stocks kiosk
 │   └── api/
 │       ├── dashboard-data/   # Aggregated MBTA, bikes, weather
+│       ├── stocks/           # HubSpot, NVIDIA, Google, SpaceX quotes
 │       └── status/           # Service health check
-├── components/               # WeatherCard, TransitCard, BikesCard, CryptoCard
-├── hooks/                    # useDashboardData, useCryptoMarkets
+├── components/               # WeatherCard, TransitCard, BikesCard, CryptoCard, StockCard
+├── hooks/                    # useDashboardData, useCryptoMarkets, useStockMarkets
 ├── lib/services/             # MBTA, Bluebikes, Weather API clients
 └── config/env.ts             # Environment and feature flags
 ```
