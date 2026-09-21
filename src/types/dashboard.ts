@@ -52,45 +52,34 @@ export interface WeatherData {
   }>;
 }
 
+export interface SpotifyTrack {
+  id: string;
+  name: string;
+  artist: string;
+  album: string;
+  albumArtUrl: string;
+  duration: number;
+  progress: number;
+  isPlaying: boolean;
+  uri: string;
+}
+
+export interface SpotifyPlayerState {
+  track: SpotifyTrack | null;
+  device: {
+    name: string;
+    type: string;
+    volume: number;
+  } | null;
+  isConnected: boolean;
+  isAuthenticated: boolean;
+}
+
 export interface DashboardData {
   mbta: MBTAStop[];
   bikes: BluebikesStation[];
   weather: WeatherData | null;
+  spotify: SpotifyPlayerState | null;
   lastUpdated: string;
   alerts: MBTAAlert[];
-}
-
-/**
- * Subset of the CoinGecko `/coins/markets` payload that the kiosk
- * crypto dashboard consumes. Only the fields actually rendered are
- * required; everything else from the API is ignored to keep payloads small.
- */
-export interface Coin {
-  id: string;
-  symbol: string;
-  name: string;
-  image: string;
-  current_price: number | null;
-  price_change_percentage_24h: number | null;
-  high_24h: number | null;
-  low_24h: number | null;
-  market_cap?: number | null;
-  market_cap_rank?: number | null;
-  last_updated?: string | null;
-}
-
-/**
- * Stock quote shape used by the `/stocks` kiosk.
- * Field names mirror the crypto card for a shared layout.
- */
-export interface Stock {
-  id: string;
-  symbol: string;
-  name: string;
-  image: string;
-  current_price: number | null;
-  price_change_percentage_24h: number | null;
-  high_24h: number | null;
-  low_24h: number | null;
-  last_updated?: string | null;
 }
