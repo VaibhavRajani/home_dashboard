@@ -4,7 +4,7 @@ import Link from "next/link";
 import { RefreshCw } from "lucide-react";
 import WeatherCard from "@/components/WeatherCard";
 import TransitCard from "@/components/TransitCard";
-import SpotifyCard from "@/components/SpotifyCard";
+import YouTubeMusicCard from "@/components/YouTubeMusicCard";
 import { fetchDashboardData } from "@/lib/api";
 import { env } from "@/config/env";
 import type { DashboardData, MBTAPrediction, MBTAStop } from "@/types/dashboard";
@@ -53,11 +53,11 @@ function Legacy({ data, onRefresh, loading }: { data: DashboardData; onRefresh: 
         </div>
       </div>
 
-      <div className="legacy-card legacy-spotify"><SpotifyCard /></div>
+      <div className="legacy-card legacy-ytmusic"><YouTubeMusicCard /></div>
     </div>
 
     <div className="legacy-footer">
-      <span>MBTA</span><span>Spotify</span><span>Weather</span>
+      <span>MBTA</span><span>YouTube Music</span><span>Weather</span>
       <span>Updated {data.lastUpdated ? new Date(data.lastUpdated).toLocaleTimeString() : "—"}</span>
       <button onClick={onRefresh} disabled={loading}>{loading ? "Updating..." : "Refresh"}</button>
       <a href="https://rent683.vercel.app">💰 Rent</a><Link href="/crypto">₿ Crypto</Link><Link href="/stocks">📈 Stocks</Link>
@@ -85,7 +85,7 @@ export default function DashboardClient({ initialData }: Props) {
     <div className="modern-dashboard">
       <div className="h-screen bg-gradient-to-br from-blue-50 to-indigo-100 p-4 flex flex-col">
         <div className="h-[15vh] mb-4"><WeatherCard weather={data.weather || null} /></div>
-        <div className="flex gap-4 flex-1 min-h-0"><div className="flex-[2]"><TransitCard stops={data.mbta || []} alerts={data.alerts || []} /></div><div className="flex-1"><SpotifyCard /></div></div>
+        <div className="flex gap-4 flex-1 min-h-0"><div className="flex-[2]"><TransitCard stops={data.mbta || []} alerts={data.alerts || []} /></div><div className="flex-1"><YouTubeMusicCard /></div></div>
         <div className="mt-2"><button onClick={refetch} disabled={loading}><RefreshCw className="w-3 h-3 inline" /> {loading ? "Refreshing..." : "Refresh"}</button></div>
       </div>
     </div>
