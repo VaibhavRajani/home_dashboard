@@ -94,6 +94,7 @@ export class DashboardService extends BaseService {
         mbta: mbtaData,
         bikes: bikesData,
         weather: weatherData,
+        spotify: null,
         alerts: alertsData,
         lastUpdated: new Date().toISOString(),
       };
@@ -127,6 +128,7 @@ export class DashboardService extends BaseService {
       mbta: [],
       bikes: [],
       weather: null,
+      spotify: null,
       alerts: [],
       lastUpdated: new Date().toISOString(),
     };
