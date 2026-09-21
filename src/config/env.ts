@@ -3,14 +3,18 @@ export const env = {
   // API Keys
   OPENWEATHER_API_KEY: process.env.OPENWEATHER_API_KEY,
   MBTA_API_KEY: process.env.MBTA_API_KEY,
+  SPOTIFY_CLIENT_ID: process.env.SPOTIFY_CLIENT_ID,
+  SPOTIFY_CLIENT_SECRET: process.env.SPOTIFY_CLIENT_SECRET,
 
   // URLs
   API_BASE_URL: process.env.NEXT_PUBLIC_API_URL || "",
+  SPOTIFY_REDIRECT_URI: process.env.SPOTIFY_REDIRECT_URI || "",
 
   // Feature flags
   ENABLE_WEATHER: process.env.NEXT_PUBLIC_ENABLE_WEATHER === "true",
   ENABLE_MBTA: process.env.NEXT_PUBLIC_ENABLE_MBTA !== "false",
   ENABLE_BLUEBIKES: process.env.NEXT_PUBLIC_ENABLE_BLUEBIKES !== "false",
+  ENABLE_SPOTIFY: process.env.NEXT_PUBLIC_ENABLE_SPOTIFY !== "false",
 
   // Refresh intervals (in milliseconds)
   MBTA_REFRESH_INTERVAL: parseInt(
@@ -21,6 +25,9 @@ export const env = {
   ),
   WEATHER_REFRESH_INTERVAL: parseInt(
     process.env.NEXT_PUBLIC_WEATHER_REFRESH_INTERVAL || "300000"
+  ),
+  SPOTIFY_REFRESH_INTERVAL: parseInt(
+    process.env.NEXT_PUBLIC_SPOTIFY_REFRESH_INTERVAL || "2000"
   ),
 } as const;
 
