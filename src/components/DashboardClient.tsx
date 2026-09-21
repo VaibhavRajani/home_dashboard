@@ -44,7 +44,7 @@ export default function DashboardClient({ initialData }: DashboardClientProps) {
   }, [refetch]);
 
   return (
-    <div className="h-screen bg-gradient-to-br from-blue-50 to-indigo-100 p-4 flex flex-col">
+    <div className="legacy-dashboard h-screen bg-gradient-to-br from-blue-50 to-indigo-100 p-4 flex flex-col">
       <div className="h-[15vh] mb-4">
         <WeatherCard weather={data.weather || null} />
       </div>
