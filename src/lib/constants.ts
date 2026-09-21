@@ -59,6 +59,7 @@ export const CACHE_TTL = {
   MBTA_ALERTS: 10 * 60 * 1000, // 10 minutes
   BLUEBIKES: 30 * 1000, // 30 seconds
   WEATHER: 5 * 60 * 1000, // 5 minutes
+  SPOTIFY: 2 * 1000, // 2 seconds
   DASHBOARD: 10 * 1000, // 10 seconds
 } as const;
 
