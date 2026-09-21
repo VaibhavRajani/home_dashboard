@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import type { SpotifyPlayerState } from "@/types/dashboard";
 import { useSpotifyPlayer } from "@/hooks/useSpotifyPlayer";
 
-function time(ms:number){const s=Math.floor(ms/1000);return Math.floor(s/60)+":"+String(s%60).padStart(2,"0");}
+function time(ms:number){const s=Math.floor(ms/1000);return Math.floor(s/60)+":"+("0"+(s%60)).slice(-2);}
 
 export default function SpotifyCard(){
   const {playerState, loading, refetch}=useSpotifyPlayer();
