@@ -31,6 +31,9 @@ export const env = {
   SPOTIFY_REFRESH_INTERVAL: parseInt(
     process.env.NEXT_PUBLIC_SPOTIFY_REFRESH_INTERVAL || "2000"
   ),
+  YTM_REFRESH_INTERVAL: parseInt(
+    process.env.NEXT_PUBLIC_YTM_REFRESH_INTERVAL || "2000"
+  ),
 } as const;
 
 // Validate required environment variables
