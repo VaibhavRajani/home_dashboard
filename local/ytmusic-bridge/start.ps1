@@ -12,4 +12,4 @@ if (-not (Test-Path ".env")) {
   Write-Host ""
 }
 
-node server.mjs
+node --env-file=.env server.mjs
