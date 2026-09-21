@@ -52,6 +52,18 @@ export interface WeatherData {
   }>;
 }
 
+export interface Coin {
+  id: string;
+  symbol: string;
+  name: string;
+  image?: string;
+  current_price: number | null;
+  price_change_percentage_24h: number | null;
+  high_24h: number | null;
+  low_24h: number | null;
+  last_updated?: string;
+}
+
 export interface Stock {
   id: string;
   symbol: string;
