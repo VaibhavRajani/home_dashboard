@@ -19,3 +19,112 @@ body {
 * {
   box-sizing: border-box;
 }
+
+
+/* iPad 4 / iOS 10 compatibility.
+   Old Safari does not support flexbox gap, backdrop-filter, several modern
+   Tailwind effects, or some of the sizing combinations used by the desktop UI.
+   Keep the normal desktop design, but give small/legacy tablet viewports a
+   simple, predictable layout. */
+@media screen and (max-width: 1100px) {
+  html,
+  body {
+    width: 100%;
+    min-width: 0;
+    overflow: hidden;
+  }
+
+  .legacy-dashboard {
+    height: 100vh !important;
+    min-height: 600px;
+    padding: 10px !important;
+    display: block !important;
+    background: #eaf2ff !important;
+    overflow: hidden;
+  }
+
+  .legacy-dashboard > div:first-child {
+    height: 22vh !important;
+    min-height: 130px;
+    margin-bottom: 8px !important;
+  }
+
+  .legacy-dashboard > div:nth-child(2) {
+    height: 65vh !important;
+    min-height: 390px;
+    display: flex !important;
+    flex-direction: row !important;
+    margin: 0 !important;
+  }
+
+  .legacy-dashboard > div:nth-child(2) > div:first-child {
+    width: 65% !important;
+    flex: none !important;
+    height: 100% !important;
+    margin-right: 8px !important;
+  }
+
+  .legacy-dashboard > div:nth-child(2) > div:last-child {
+    width: 35% !important;
+    flex: none !important;
+    height: 100% !important;
+  }
+
+  .legacy-dashboard > div:last-child {
+    height: 9vh !important;
+    min-height: 45px;
+    margin-top: 8px !important;
+  }
+
+  /* iOS 10 Safari has no flex gap. */
+  .legacy-dashboard [class*="gap-"] {
+    gap: 0 !important;
+  }
+
+  .legacy-dashboard [class*="space-x-"] > * + * {
+    margin-left: 8px !important;
+  }
+
+  .legacy-dashboard [class*="space-y-"] > * + * {
+    margin-top: 8px !important;
+  }
+
+  /* Avoid expensive/unsupported visual effects on the old GPU/browser. */
+  .legacy-dashboard [class*="backdrop-blur"] {
+    -webkit-backdrop-filter: none !important;
+    backdrop-filter: none !important;
+  }
+
+  .legacy-dashboard [class*="animate-"] {
+    animation: none !important;
+  }
+
+  .legacy-dashboard [class*="blur-"] {
+    filter: none !important;
+  }
+
+  /* Keep card content inside the viewport. */
+  .legacy-dashboard .overflow-y-auto {
+    -webkit-overflow-scrolling: touch;
+    overflow-y: auto;
+  }
+
+  /* Prevent old Safari from treating flex children as intrinsically huge. */
+  .legacy-dashboard [class*="min-h-0"] {
+    min-height: 0 !important;
+  }
+}
+
+@media screen and (max-width: 700px) {
+  .legacy-dashboard > div:nth-child(2) {
+    height: 64vh !important;
+  }
+
+  .legacy-dashboard > div:nth-child(2) > div:first-child {
+    width: 58% !important;
+  }
+
+  .legacy-dashboard > div:nth-child(2) > div:last-child {
+    width: 42% !important;
+  }
+}
