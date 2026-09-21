@@ -9,6 +9,8 @@ export const env = {
   // URLs
   API_BASE_URL: process.env.NEXT_PUBLIC_API_URL || "",
   SPOTIFY_REDIRECT_URI: process.env.SPOTIFY_REDIRECT_URI || "",
+  YTM_BRIDGE_URL: process.env.NEXT_PUBLIC_YTM_BRIDGE_URL || "",
+  YTM_BRIDGE_KEY: process.env.NEXT_PUBLIC_YTM_BRIDGE_KEY || "",
 
   // Feature flags
   ENABLE_WEATHER: process.env.NEXT_PUBLIC_ENABLE_WEATHER === "true",
