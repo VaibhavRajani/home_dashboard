@@ -128,3 +128,17 @@ body {
     width: 42% !important;
   }
 }
+
+.legacy-dashboard{display:none}.modern-dashboard{display:block}
+@media screen and (max-width:1100px){
+html,body{margin:0!important;padding:0!important;width:100%;height:100%;overflow:hidden}
+.modern-dashboard{display:none!important}
+.legacy-dashboard{display:block!important;width:100%;height:100vh;min-height:700px;padding:8px;box-sizing:border-box;background:#eaf1fb;color:#1d2733;font-family:Arial,Helvetica,sans-serif;overflow:hidden}
+.legacy-weather{height:175px;padding:15px;box-sizing:border-box;background:#2468d8;color:white;border-radius:12px;margin-bottom:8px;display:flex;align-items:center}
+.legacy-temp{font-size:42px;font-weight:bold;width:18%}.legacy-wdesc{width:18%;font-size:15px;line-height:1.6}.legacy-clock{width:27%;text-align:center}.legacy-clock b,.legacy-clock strong{display:block}.legacy-clock strong{font-size:30px;margin-top:7px}.legacy-stat{width:12%;padding:10px 3px;margin-left:7px;text-align:center;border:1px solid #fff;border-radius:7px;font-size:13px}.legacy-stat b{display:block;margin-bottom:7px}
+.legacy-main{height:calc(100vh - 240px);min-height:430px;display:flex}.legacy-card{height:100%;box-sizing:border-box;background:#fff;border:1px solid #c4cfdd;border-radius:11px;overflow:hidden}.legacy-transit{width:65%;margin-right:8px}.legacy-bikes{width:35%}
+.legacy-head{height:48px;padding:0 12px;box-sizing:border-box;display:flex;align-items:center;color:white;font-size:17px}.legacy-head b{margin-right:10px}.legacy-head span{font-size:12px}.legacy-head.green{background:#20a957}.legacy-head.blue{background:#168fe5}
+.legacy-body{padding:8px;height:calc(100% - 48px);box-sizing:border-box;overflow:hidden}.legacy-stop{border:1px solid #aebccc;border-radius:7px;padding:7px;margin-bottom:7px}.legacy-title{display:block;margin-bottom:6px}.legacy-cols{display:flex}.legacy-cols>div{width:50%;box-sizing:border-box;padding:0 5px}.legacy-cols>div+div{border-left:1px solid #d0d8e2}.legacy-cols>div>b{font-size:12px}.legacy-train{height:37px;margin-top:4px;padding:6px;border:1px solid #c1cbd7;border-radius:5px;box-sizing:border-box;font-size:11px;white-space:nowrap;overflow:hidden}.legacy-train strong{float:right}
+.legacy-summary{height:68px;display:flex;border-bottom:1px solid #ccd6e1}.legacy-summary div{width:33.33%;text-align:center;padding-top:10px}.legacy-summary div+div{border-left:1px solid #ccd6e1}.legacy-summary b,.legacy-summary small{display:block}.legacy-summary b{font-size:23px;color:#1268b2}.legacy-summary small{font-size:11px;margin-top:4px}.legacy-list{padding:7px;overflow:hidden}.legacy-bike{border:1px solid #c1cbd7;border-radius:6px;padding:7px;margin-bottom:6px;font-size:11px}.legacy-bike b{display:block;margin-bottom:4px}.legacy-bike span{margin-right:7px}
+.legacy-footer{height:47px;margin-top:8px;background:#fff;border:1px solid #c4cfdd;border-radius:7px;display:flex;align-items:center;padding:0 7px;box-sizing:border-box;font-size:10px}.legacy-footer span{margin-right:8px}.legacy-footer button,.legacy-footer a{background:#2870d8;color:#fff;border:0;border-radius:5px;padding:7px 9px;margin-left:5px;text-decoration:none;font-size:10px}.legacy-footer a[href*="rent"]{background:#32a84d}.legacy-footer a[href*="crypto"]{background:#e7891b}
+}
