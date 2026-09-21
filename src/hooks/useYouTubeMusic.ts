@@ -30,14 +30,18 @@ interface YtmAuthStatus {
 }
 
 function headers() {
-  return env.YTM_BRIDGE_KEY ? { "X-Bridge-Key": env.YTM_BRIDGE_KEY } : {};
+  const value = new Headers();
+  if (env.YTM_BRIDGE_KEY) value.set("X-Bridge-Key", env.YTM_BRIDGE_KEY);
+  return value;
 }
 
 async function bridgeFetch(path: string, options: RequestInit = {}) {
   if (!env.YTM_BRIDGE_URL) throw new Error("YouTube Music bridge URL is not configured.");
+  const requestHeaders = new Headers(options.headers);
+  headers().forEach((value, key) => requestHeaders.set(key, value));
   return fetch(env.YTM_BRIDGE_URL.replace(/\/$/, "") + path, {
     ...options,
-    headers: { ...headers(), ...(options.headers || {}) },
+    headers: requestHeaders,
     cache: "no-store",
   });
 }
