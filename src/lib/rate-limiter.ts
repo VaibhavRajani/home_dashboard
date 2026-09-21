@@ -43,6 +43,7 @@ export const RATE_LIMITS = {
   MBTA_ALERTS_API: { windowMs: 60000, maxRequests: 5 },
   BLUEBIKES_API: { windowMs: 60000, maxRequests: 30 },
   WEATHER_API: { windowMs: 60000, maxRequests: 60 },
+  SPOTIFY_API: { windowMs: 1000, maxRequests: 10 },
   DASHBOARD_API: { windowMs: 1000, maxRequests: 5 },
 } as const;
 
