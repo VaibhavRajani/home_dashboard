@@ -4,7 +4,7 @@ import Link from "next/link";
 import { RefreshCw } from "lucide-react";
 import WeatherCard from "@/components/WeatherCard";
 import TransitCard from "@/components/TransitCard";
-import BikesCard from "@/components/BikesCard";
+import SpotifyCard from "@/components/SpotifyCard";
 import { fetchDashboardData } from "@/lib/api";
 import { env } from "@/config/env";
 import type { DashboardData, MBTAPrediction, MBTAStop } from "@/types/dashboard";
@@ -26,9 +26,6 @@ function Legacy({ data, onRefresh, loading }: { data: DashboardData; onRefresh: 
     else if (s.stopName.indexOf("Inbound") >= 0 || s.stopId === "70230" || s.stopId === "70176") groups[n].i = s;
   });
 
-  const bikes = data.bikes.reduce((n, s) => n + s.numBikesAvailable, 0);
-  const ebikes = data.bikes.reduce((n, s) => n + s.numEbikesAvailable, 0);
-  const docks = data.bikes.reduce((n, s) => n + s.numDocksAvailable, 0);
   const w = data.weather;
 
   const predictions = (stop: MBTAStop | null, direction: number): MBTAPrediction[] =>
@@ -56,15 +53,11 @@ function Legacy({ data, onRefresh, loading }: { data: DashboardData; onRefresh: 
         </div>
       </div>
 
-      <div className="legacy-card legacy-bikes">
-        <div className="legacy-head blue"><b>🚲 Bluebikes</b><span>Washington Square</span></div>
-        <div className="legacy-summary"><div><b>{bikes}</b><small>Bikes</small></div><div><b>{ebikes}</b><small>E-Bikes</small></div><div><b>{docks}</b><small>Docks</small></div></div>
-        <div className="legacy-list">{data.bikes.map((s) => <div className="legacy-bike" key={s.stationId}><b>{s.stationId}</b><span>{s.numBikesAvailable} bikes</span><span>{s.numEbikesAvailable} e-bikes</span><span>{s.numDocksAvailable} docks</span></div>)}</div>
-      </div>
+      <div className="legacy-card legacy-spotify"><SpotifyCard /></div>
     </div>
 
     <div className="legacy-footer">
-      <span>MBTA</span><span>Bluebikes</span><span>Weather</span>
+      <span>MBTA</span><span>Spotify</span><span>Weather</span>
       <span>Updated {data.lastUpdated ? new Date(data.lastUpdated).toLocaleTimeString() : "—"}</span>
       <button onClick={onRefresh} disabled={loading}>{loading ? "Updating..." : "Refresh"}</button>
       <a href="https://rent683.vercel.app">💰 Rent</a><Link href="/crypto">₿ Crypto</Link><Link href="/stocks">📈 Stocks</Link>
@@ -92,7 +85,7 @@ export default function DashboardClient({ initialData }: Props) {
     <div className="modern-dashboard">
       <div className="h-screen bg-gradient-to-br from-blue-50 to-indigo-100 p-4 flex flex-col">
         <div className="h-[15vh] mb-4"><WeatherCard weather={data.weather || null} /></div>
-        <div className="flex gap-4 flex-1 min-h-0"><div className="flex-[2]"><TransitCard stops={data.mbta || []} alerts={data.alerts || []} /></div><div className="flex-1"><BikesCard stations={data.bikes || []} /></div></div>
+        <div className="flex gap-4 flex-1 min-h-0"><div className="flex-[2]"><TransitCard stops={data.mbta || []} alerts={data.alerts || []} /></div><div className="flex-1"><SpotifyCard /></div></div>
         <div className="mt-2"><button onClick={refetch} disabled={loading}><RefreshCw className="w-3 h-3 inline" /> {loading ? "Refreshing..." : "Refresh"}</button></div>
       </div>
     </div>
